@@ -2,11 +2,6 @@ export enum ElementType {
   TEXT_ELEMENT = "TEXT_ELEMENT",
 }
 
-export enum ElementProperties {
-  CLASS_NAME = "className",
-  STYLE = "style",
-}
-
 export type DidactElement<
   T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap
 > = {

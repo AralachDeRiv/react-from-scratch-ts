@@ -1,21 +1,35 @@
 import { DidactElement, TextElement, ElementType } from "./type";
 
+// TODO : Commenter ici
 export function createElement(
   type: keyof HTMLElementTagNameMap,
   props: Record<string, any> | null,
-  children: (DidactElement | (string | number))[]
+  children: (DidactElement | string | number)[] = []
 ): DidactElement {
-  const processedChildren = children.map((child) => {
-    if (typeof child === "string" || typeof child === "number") {
-      return createTextElement(child);
+  // Si les enfants sont dans `props`, on les extrait
+  const { children: propChildren, ...restProps } = props || {}; // Extraire les enfants si ils existent dans `props`
+
+  // Les enfants passés explicitement (paramètre `children`) ont la priorité
+  const finalChildren = children.length > 0 ? children : propChildren || [];
+
+  // Dans le cas où le childre est un text element, celui-ci sera rendu comme une chaine de caractère et non une liste
+  const normalizedChildren = Array.isArray(finalChildren)
+    ? finalChildren
+    : [finalChildren];
+
+  const processedChildren = normalizedChildren.map(
+    (child: string | number | DidactElement) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return createTextElement(child);
+      }
+      return child;
     }
-    return child;
-  });
+  );
 
   return {
     type,
     props: {
-      ...props,
+      ...restProps,
       children: processedChildren,
     },
   };
@@ -30,6 +44,7 @@ export function createTextElement(text: string | number): TextElement {
   };
 }
 
+// TODO : Commenter ici
 export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
@@ -46,8 +61,11 @@ export function render(
     Object.keys(element.props)
       .filter(isProperty)
       .forEach((name) => {
-        if (name in dom) {
-          // Solution pas optimale mais ts ne semble pas accepter l'attribution dynamique de props de HTMLElement
+        // Si la propriété est 'style', on la gère différemment
+        if (name === "style" && typeof element.props[name] === "object") {
+          const styles = element.props[name] as Record<string, string>;
+          Object.assign(dom.style, styles);
+        } else if (name in dom) {
           (dom as any)[name] = element.props[name];
         } else {
           dom.setAttribute(name, element.props[name]);
@@ -61,9 +79,3 @@ export function render(
 
   container.appendChild(dom);
 }
-
-export const Didact = {
-  createElement,
-  createTextElement,
-  render,
-};
