@@ -3,6 +3,14 @@ export type ReactElement<
 > = {
   type: T;
   props: Partial<Record<string, any>> & {
-    children?: ReactElement | ReactElement[] | string;
+    children: (ReactElement | TextElement)[];
+  };
+};
+
+export type TextElement = {
+  type: "TEXT_ELEMENT";
+  props: {
+    nodeValue: string;
+    // N'aura pas d'enfants dans ce cas ci
   };
 };

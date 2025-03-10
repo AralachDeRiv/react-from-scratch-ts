@@ -1,12 +1,7 @@
 import { ReactElement } from "./react/type";
+import { createElement } from "./react/functions";
 
-const element: ReactElement = {
-  type: "h1",
-  props: {
-    title: "foo",
-    children: "Hello",
-  },
-};
+const element: ReactElement = createElement("h1", { title: "foo" }, ["Hello"]);
 
 const container = document.getElementById("root");
 
@@ -15,8 +10,8 @@ node["title"] = element.props.title ?? "";
 
 const text = document.createTextNode("");
 
-if (typeof element.props.children == "string") {
-  text.nodeValue = element.props.children;
+if (typeof element.props.children?.[0] == "string") {
+  text.nodeValue = element.props.children[0];
 }
 
 node.appendChild(text);
