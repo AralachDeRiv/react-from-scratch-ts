@@ -1,9 +1,6 @@
-import { DidactElement } from "./react/type";
-import { Didact } from "./react/functions";
+import { Didact } from "./Didact/functions";
 
-const element: DidactElement = Didact.createElement("h1", { title: "foo" }, [
-  "Hello",
-]);
+const element = Didact.createElement("h1", { title: "foo" }, ["Hello"]);
 
 const container = document.getElementById("root");
 
@@ -18,3 +15,11 @@ if (typeof element.props.children?.[0] == "string") {
 
 node.appendChild(text);
 container?.appendChild(node);
+
+/** @jsx Didact.createElement */
+// const element  = (
+//     <div style="background: salmon">
+//       <h1>Hello World</h1>
+//       <h2 style="text-align:right">from Didact</h2>
+//     </div>
+//   );

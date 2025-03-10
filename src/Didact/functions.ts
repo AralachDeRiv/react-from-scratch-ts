@@ -1,9 +1,4 @@
-import {
-  DidactElement,
-  TextElement,
-  ElementType,
-  ElementProperties,
-} from "./type";
+import { DidactElement, TextElement, ElementType } from "./type";
 
 function createElement(
   type: keyof HTMLElementTagNameMap,
