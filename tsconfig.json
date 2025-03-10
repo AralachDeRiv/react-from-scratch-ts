@@ -18,7 +18,19 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* JSX support */
+    "jsx": "react-jsx",
+    "jsxImportSource": "Didact",
+
+    /* Résolution des modules */
+    "baseUrl": "src",
+    "paths": {
+      "Didact": ["Didact/index"],
+      "Didact/jsx-runtime": ["Didact/jsx-runtime"],
+      "Didact/jsx-dev-runtime": ["Didact/jsx-dev-runtime"]
+    }
   },
   "include": ["src"]
 }
