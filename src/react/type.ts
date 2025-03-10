@@ -1,15 +1,8 @@
-export type Element = {
-  type: keyof HTMLElementTagNameMap;
-  props: {
-    title: string;
-    children: string;
+export type ReactElement<
+  T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap
+> = {
+  type: T;
+  props: Partial<Record<string, any>> & {
+    children?: ReactElement | ReactElement[] | string;
   };
 };
-
-// const element = {
-//   type: "h1",
-//   props: {
-//     title: "foo",
-//     children: "Hello",
-//   },
-// }
