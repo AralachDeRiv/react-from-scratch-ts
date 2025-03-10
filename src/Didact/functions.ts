@@ -1,6 +1,6 @@
 import { DidactElement, TextElement, ElementType } from "./type";
 
-function createElement(
+export function createElement(
   type: keyof HTMLElementTagNameMap,
   props: Record<string, any> | null,
   children: (DidactElement | (string | number))[]
@@ -21,7 +21,7 @@ function createElement(
   };
 }
 
-function createTextElement(text: string | number): TextElement {
+export function createTextElement(text: string | number): TextElement {
   return {
     type: ElementType.TEXT_ELEMENT,
     props: {
@@ -30,7 +30,10 @@ function createTextElement(text: string | number): TextElement {
   };
 }
 
-function render(element: DidactElement | TextElement, container: HTMLElement) {
+export function render(
+  element: DidactElement | TextElement,
+  container: HTMLElement
+) {
   const dom =
     element.type == ElementType.TEXT_ELEMENT
       ? document.createTextNode("")
