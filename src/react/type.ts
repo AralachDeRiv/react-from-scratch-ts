@@ -1,9 +1,9 @@
-export type ReactElement<
+export type DidactElement<
   T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap
 > = {
   type: T;
   props: Partial<Record<string, any>> & {
-    children: (ReactElement | TextElement)[];
+    children: (DidactElement | TextElement)[];
   };
 };
 

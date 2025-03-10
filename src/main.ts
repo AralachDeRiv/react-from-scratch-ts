@@ -1,7 +1,9 @@
-import { ReactElement } from "./react/type";
-import { createElement } from "./react/functions";
+import { DidactElement } from "./react/type";
+import { Didact } from "./react/functions";
 
-const element: ReactElement = createElement("h1", { title: "foo" }, ["Hello"]);
+const element: DidactElement = Didact.createElement("h1", { title: "foo" }, [
+  "Hello",
+]);
 
 const container = document.getElementById("root");
 

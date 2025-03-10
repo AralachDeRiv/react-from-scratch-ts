@@ -1,10 +1,10 @@
-import { ReactElement, TextElement } from "./type";
+import { DidactElement, TextElement } from "./type";
 
-export function createElement(
+function createElement(
   type: keyof HTMLElementTagNameMap,
   props: Record<string, any> | null,
-  children: (ReactElement | (string | number))[]
-): ReactElement {
+  children: (DidactElement | (string | number))[]
+): DidactElement {
   const processedChildren = children.map((child) => {
     if (typeof child === "string" || typeof child === "number") {
       return createTextElement(child);
@@ -21,7 +21,7 @@ export function createElement(
   };
 }
 
-export function createTextElement(text: string | number): TextElement {
+function createTextElement(text: string | number): TextElement {
   return {
     type: "TEXT_ELEMENT",
     props: {
@@ -29,3 +29,8 @@ export function createTextElement(text: string | number): TextElement {
     },
   };
 }
+
+export const Didact = {
+  createElement,
+  createTextElement,
+};
