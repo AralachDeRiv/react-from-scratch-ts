@@ -1,6 +1,6 @@
 import { DidactElement, TextElement, ElementType } from "../types/type";
 
-// TODO : Commenter ici
+// TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
 export function createElement(
   type: keyof HTMLElementTagNameMap,
   props: Record<string, any> | null,
@@ -79,3 +79,42 @@ export function render(
 
   container.appendChild(dom);
 }
+
+export function createDom(fiber: DidactElement | TextElement) {
+  const dom =
+    fiber.type == ElementType.TEXT_ELEMENT
+      ? document.createTextNode("")
+      : document.createElement(fiber.type);
+
+  if (fiber.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
+    const isProperty = (key: string) => key !== "children";
+
+    Object.keys(fiber.props)
+      .filter(isProperty)
+      .forEach((name) => {
+        if (name in dom) {
+          (dom as any)[name] = fiber.props[name];
+        } else {
+          dom.setAttribute(name, fiber.props[name]);
+        }
+      });
+  }
+
+  return dom;
+}
+
+// let nextUnitOfWork = null
+// ​
+// function workLoop(deadline) {
+//   let shouldYield = false
+//   while (nextUnitOfWork && !shouldYield) {
+//     nextUnitOfWork = performUnitOfWork(
+//       nextUnitOfWork
+//     )
+//     shouldYield = deadline.timeRemaining() < 1
+//   }
+//   requestIdleCallback(workLoop)
+// }
+// ​
+// requestIdleCallback(workLoop)
+// ​
