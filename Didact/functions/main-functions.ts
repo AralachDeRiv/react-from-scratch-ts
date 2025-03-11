@@ -87,11 +87,37 @@ export function createTextElement(text: string | number): TextElement {
 //   container.appendChild(dom);
 // }
 
+let wipRoot: Fiber | null = null;
 let nextUnitOfWork: Fiber | null = null;
+
 export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
-) {}
+) {
+  wipRoot = createFiber(element, null);
+  wipRoot.dom = container;
+
+  nextUnitOfWork = wipRoot;
+}
+
+function commitRoot() {
+  commitWork(wipRoot?.child ?? null);
+  wipRoot = null;
+}
+
+function commitWork(fiber: Fiber | null) {
+  if (!fiber) {
+    return;
+  }
+  const domParent = fiber?.parent?.dom ?? null;
+
+  if (domParent instanceof HTMLElement && fiber.dom instanceof HTMLElement) {
+    domParent.appendChild(fiber.dom);
+  }
+
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
 
 export function createDom(fiber: Fiber) {
   const dom =
@@ -120,24 +146,10 @@ export function createDom(fiber: Fiber) {
   return dom;
 }
 
-// let nextUnitOfWork = null
-// ​
-// function workLoop(deadline) {
-//   let shouldYield = false
-//   while (nextUnitOfWork && !shouldYield) {
-//     nextUnitOfWork = performUnitOfWork(
-//       nextUnitOfWork
-//     )
-//     shouldYield = deadline.timeRemaining() < 1
-//   }
-//   requestIdleCallback(workLoop)
-// }
-// ​
-// requestIdleCallback(workLoop)
-
+// TODO : Pt un moyen de rendre ceci + élégant
 function createFiber(
   element: DidactElement | TextElement,
-  parent: Fiber
+  parent: Fiber | null
 ): Fiber {
   if (isTextElement(element)) {
     return {
@@ -163,10 +175,6 @@ function createFiber(
 export function performUnitOfWork(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
-  }
-
-  if (fiber.parent && fiber.parent.dom) {
-    fiber.parent.dom.appendChild(fiber.dom);
   }
 
   if (isDidactElementFiber(fiber)) {
@@ -201,3 +209,22 @@ export function performUnitOfWork(fiber: Fiber) {
     nextFiber = nextFiber.parent;
   }
 }
+
+function workLoop(deadline: IdleDeadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    if (nextUnitOfWork) {
+      nextUnitOfWork = performUnitOfWork(nextUnitOfWork) ?? null;
+    }
+
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
+  requestIdleCallback(workLoop);
+}
+
+// requestIdleCallback(workLoop)
