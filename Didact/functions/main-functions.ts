@@ -2,7 +2,9 @@ import {
   DidactElement,
   TextElement,
   ElementType,
-  UnitOfWork,
+  Fiber,
+  isDidactElementFiber,
+  isTextElement,
 } from "../types/type";
 
 // TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
@@ -85,20 +87,13 @@ export function createTextElement(text: string | number): TextElement {
 //   container.appendChild(dom);
 // }
 
-let nextUnitOfWork: UnitOfWork | null = null;
+let nextUnitOfWork: Fiber | null = null;
 export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
-) {
-  nextUnitOfWork = {
-    dom: container,
-    props: {
-      children: [element],
-    },
-  };
-}
+) {}
 
-export function createDom(fiber: DidactElement | TextElement) {
+export function createDom(fiber: Fiber) {
   const dom =
     fiber.type == ElementType.TEXT_ELEMENT
       ? document.createTextNode("")
@@ -110,7 +105,11 @@ export function createDom(fiber: DidactElement | TextElement) {
     Object.keys(fiber.props)
       .filter(isProperty)
       .forEach((name) => {
-        if (name in dom) {
+        // Si la propriété est 'style', on la gère différemment
+        if (name === "style" && typeof fiber.props[name] === "object") {
+          const styles = fiber.props[name] as Record<string, string>;
+          Object.assign(dom.style, styles);
+        } else if (name in dom) {
           (dom as any)[name] = fiber.props[name];
         } else {
           dom.setAttribute(name, fiber.props[name]);
@@ -135,4 +134,70 @@ export function createDom(fiber: DidactElement | TextElement) {
 // }
 // ​
 // requestIdleCallback(workLoop)
-// ​
+
+function createFiber(
+  element: DidactElement | TextElement,
+  parent: Fiber
+): Fiber {
+  if (isTextElement(element)) {
+    return {
+      type: element.type,
+      props: element.props,
+      dom: null,
+      parent: parent,
+      child: null,
+      sibling: null,
+    };
+  } else {
+    return {
+      type: element.type,
+      props: element.props,
+      dom: null,
+      parent: parent,
+      child: null,
+      sibling: null,
+    };
+  }
+}
+
+export function performUnitOfWork(fiber: Fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+
+  if (fiber.parent && fiber.parent.dom) {
+    fiber.parent.dom.appendChild(fiber.dom);
+  }
+
+  if (isDidactElementFiber(fiber)) {
+    const elements = fiber.props.children;
+    let index = 0;
+    let prevSibling: Fiber | null = null;
+
+    while (index < elements.length) {
+      const element = elements[index];
+      const newFiber: Fiber = createFiber(element, fiber);
+
+      if (index === 0) {
+        fiber.child = newFiber;
+      } else if (prevSibling) {
+        prevSibling.sibling = newFiber;
+      }
+
+      prevSibling = newFiber;
+      index++;
+    }
+  }
+
+  if (fiber.child) {
+    return fiber.child;
+  }
+
+  let nextFiber: Fiber | null = fiber;
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling;
+    }
+    nextFiber = nextFiber.parent;
+  }
+}
