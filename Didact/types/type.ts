@@ -18,3 +18,11 @@ export type TextElement = {
     // N'aura pas d'enfants dans ce cas ci
   };
 };
+
+// TODO : be more precise with the children
+export type UnitOfWork = {
+  dom: HTMLElement;
+  props: {
+    children: any[];
+  };
+};
