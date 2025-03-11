@@ -1,4 +1,4 @@
-import { DidactElement, TextElement, ElementType } from "./type";
+import { DidactElement, TextElement, ElementType } from "../types/type";
 
 // TODO : Commenter ici
 export function createElement(

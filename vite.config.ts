@@ -1,11 +1,10 @@
-// vite.config.ts
 import { defineConfig } from "vite";
+import path from "path";
 
-// TODO : Commenter ici
 export default defineConfig({
   resolve: {
     alias: {
-      Didact: "/src/Didact", // Ici, l'alias pour Didact
+      Didact: path.resolve(__dirname, "Didact"),
     },
   },
 });

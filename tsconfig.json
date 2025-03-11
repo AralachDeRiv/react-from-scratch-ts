@@ -26,12 +26,12 @@
     "jsxImportSource": "Didact",
 
     /* Résolution des modules */
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
       "Didact": ["Didact/index"],
-      "Didact/jsx-runtime": ["Didact/jsx-runtime"],
-      "Didact/jsx-dev-runtime": ["Didact/jsx-dev-runtime"]
+      "Didact/jsx-runtime": ["Didact/jsx-runtime.ts"],
+      "Didact/jsx-dev-runtime": ["Didact/jsx-dev-runtime.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "Didact"]
 }
