@@ -7,4 +7,4 @@ const element = (
   </div>
 );
 
-// Didact.render(element, document.getElementById("root")!);
+Didact.render(element, document.getElementById("root")!);

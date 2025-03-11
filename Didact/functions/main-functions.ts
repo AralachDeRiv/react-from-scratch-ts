@@ -1,3 +1,40 @@
+// export function render(
+//   element: DidactElement | TextElement,
+//   container: HTMLElement
+// ) {
+//   const dom =
+//     element.type == ElementType.TEXT_ELEMENT
+//       ? document.createTextNode("")
+//       : document.createElement(element.type);
+
+//   if (element.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
+//     element.props.children.forEach((child) => render(child, dom));
+
+//     const isProperty = (key: string) => key !== "children";
+//     Object.keys(element.props)
+//       .filter(isProperty)
+//       .forEach((name) => {
+//         // Si la propriété est 'style', on la gère différemment
+//         if (name === "style" && typeof element.props[name] === "object") {
+//           const styles = element.props[name] as Record<string, string>;
+//           Object.assign(dom.style, styles);
+//         } else if (name in dom) {
+//           (dom as any)[name] = element.props[name];
+//         } else {
+//           dom.setAttribute(name, element.props[name]);
+//         }
+//       });
+//   }
+
+//   if (element.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
+//     dom.nodeValue = element.props.nodeValue;
+//   }
+
+//   container.appendChild(dom);
+// }
+
+// START
+
 import {
   DidactElement,
   TextElement,
@@ -51,42 +88,6 @@ export function createTextElement(text: string | number): TextElement {
   };
 }
 
-// TODO : Commenter ici
-// export function render(
-//   element: DidactElement | TextElement,
-//   container: HTMLElement
-// ) {
-//   const dom =
-//     element.type == ElementType.TEXT_ELEMENT
-//       ? document.createTextNode("")
-//       : document.createElement(element.type);
-
-//   if (element.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
-//     element.props.children.forEach((child) => render(child, dom));
-
-//     const isProperty = (key: string) => key !== "children";
-//     Object.keys(element.props)
-//       .filter(isProperty)
-//       .forEach((name) => {
-//         // Si la propriété est 'style', on la gère différemment
-//         if (name === "style" && typeof element.props[name] === "object") {
-//           const styles = element.props[name] as Record<string, string>;
-//           Object.assign(dom.style, styles);
-//         } else if (name in dom) {
-//           (dom as any)[name] = element.props[name];
-//         } else {
-//           dom.setAttribute(name, element.props[name]);
-//         }
-//       });
-//   }
-
-//   if (element.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
-//     dom.nodeValue = element.props.nodeValue;
-//   }
-
-//   container.appendChild(dom);
-// }
-
 let wipRoot: Fiber | null = null;
 let nextUnitOfWork: Fiber | null = null;
 
@@ -111,7 +112,10 @@ function commitWork(fiber: Fiber | null) {
   }
   const domParent = fiber?.parent?.dom ?? null;
 
-  if (domParent instanceof HTMLElement && fiber.dom instanceof HTMLElement) {
+  if (
+    domParent instanceof HTMLElement &&
+    (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text)
+  ) {
     domParent.appendChild(fiber.dom);
   }
 
@@ -141,6 +145,10 @@ export function createDom(fiber: Fiber) {
           dom.setAttribute(name, fiber.props[name]);
         }
       });
+  }
+
+  if (fiber.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
+    dom.nodeValue = fiber.props.nodeValue;
   }
 
   return dom;
@@ -176,6 +184,8 @@ export function performUnitOfWork(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
+
+  console.log(fiber);
 
   if (isDidactElementFiber(fiber)) {
     const elements = fiber.props.children;
@@ -227,4 +237,4 @@ function workLoop(deadline: IdleDeadline) {
   requestIdleCallback(workLoop);
 }
 
-// requestIdleCallback(workLoop)
+requestIdleCallback(workLoop);
