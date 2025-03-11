@@ -1,4 +1,9 @@
-import { DidactElement, TextElement, ElementType } from "../types/type";
+import {
+  DidactElement,
+  TextElement,
+  ElementType,
+  UnitOfWork,
+} from "../types/type";
 
 // TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
 export function createElement(
@@ -45,39 +50,52 @@ export function createTextElement(text: string | number): TextElement {
 }
 
 // TODO : Commenter ici
+// export function render(
+//   element: DidactElement | TextElement,
+//   container: HTMLElement
+// ) {
+//   const dom =
+//     element.type == ElementType.TEXT_ELEMENT
+//       ? document.createTextNode("")
+//       : document.createElement(element.type);
+
+//   if (element.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
+//     element.props.children.forEach((child) => render(child, dom));
+
+//     const isProperty = (key: string) => key !== "children";
+//     Object.keys(element.props)
+//       .filter(isProperty)
+//       .forEach((name) => {
+//         // Si la propriété est 'style', on la gère différemment
+//         if (name === "style" && typeof element.props[name] === "object") {
+//           const styles = element.props[name] as Record<string, string>;
+//           Object.assign(dom.style, styles);
+//         } else if (name in dom) {
+//           (dom as any)[name] = element.props[name];
+//         } else {
+//           dom.setAttribute(name, element.props[name]);
+//         }
+//       });
+//   }
+
+//   if (element.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
+//     dom.nodeValue = element.props.nodeValue;
+//   }
+
+//   container.appendChild(dom);
+// }
+
+let nextUnitOfWork: UnitOfWork | null = null;
 export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
 ) {
-  const dom =
-    element.type == ElementType.TEXT_ELEMENT
-      ? document.createTextNode("")
-      : document.createElement(element.type);
-
-  if (element.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
-    element.props.children.forEach((child) => render(child, dom));
-
-    const isProperty = (key: string) => key !== "children";
-    Object.keys(element.props)
-      .filter(isProperty)
-      .forEach((name) => {
-        // Si la propriété est 'style', on la gère différemment
-        if (name === "style" && typeof element.props[name] === "object") {
-          const styles = element.props[name] as Record<string, string>;
-          Object.assign(dom.style, styles);
-        } else if (name in dom) {
-          (dom as any)[name] = element.props[name];
-        } else {
-          dom.setAttribute(name, element.props[name]);
-        }
-      });
-  }
-
-  if (element.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
-    dom.nodeValue = element.props.nodeValue;
-  }
-
-  container.appendChild(dom);
+  nextUnitOfWork = {
+    dom: container,
+    props: {
+      children: [element],
+    },
+  };
 }
 
 export function createDom(fiber: DidactElement | TextElement) {
