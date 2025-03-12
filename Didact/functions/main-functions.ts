@@ -5,6 +5,7 @@ import {
   Fiber,
   isDidactElementFiber,
   isTextElement,
+  DidactElementFiber,
 } from "../types/type";
 
 // 1. Création des éléments
@@ -65,6 +66,7 @@ function createFiber(
       parent: parent,
       child: null,
       sibling: null,
+      alternate: null,
     };
   } else {
     return {
@@ -74,6 +76,7 @@ function createFiber(
       parent: parent,
       child: null,
       sibling: null,
+      alternate: null,
     };
   }
 }
@@ -81,6 +84,7 @@ function createFiber(
 // 2. Variables globales
 let wipRoot: Fiber | null = null;
 let nextUnitOfWork: Fiber | null = null;
+let currentRoot: Fiber | null = null;
 
 // 3. Rendu initial
 export function render(
@@ -94,6 +98,7 @@ export function render(
     parent: null,
     child: null,
     sibling: null,
+    alternate: currentRoot,
   };
 
   wipRoot.child = createFiber(element, wipRoot);
@@ -147,23 +152,7 @@ export function performUnitOfWork(fiber: Fiber) {
   }
 
   if (isDidactElementFiber(fiber)) {
-    const elements = fiber.props.children;
-    let index = 0;
-    let prevSibling: Fiber | null = null;
-
-    while (index < elements.length) {
-      const element = elements[index];
-      const newFiber: Fiber = createFiber(element, fiber);
-
-      if (index === 0) {
-        fiber.child = newFiber;
-      } else if (prevSibling) {
-        prevSibling.sibling = newFiber;
-      }
-
-      prevSibling = newFiber;
-      index++;
-    }
+    reconcileChildren(fiber);
   }
 
   if (fiber.child) {
@@ -179,8 +168,65 @@ export function performUnitOfWork(fiber: Fiber) {
   }
 }
 
+function reconcileChildren(fiber: DidactElementFiber) {
+  const elements = fiber.props.children;
+  let index = 0;
+  let prevSibling: Fiber | null = null;
+
+  while (index < elements.length) {
+    const element = elements[index];
+    const newFiber: Fiber = createFiber(element, fiber);
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    } else if (prevSibling) {
+      prevSibling.sibling = newFiber;
+    }
+
+    prevSibling = newFiber;
+    index++;
+  }
+}
+
+// function reconcileChildren(wipFiber, elements) {
+//   let index = 0
+//   let oldFiber =
+//     wipFiber.alternate && wipFiber.alternate.child
+//   let prevSibling = null
+
+//   while (
+//     index < elements.length ||
+//     oldFiber != null
+//   ) {
+//   while (index < elements.length) {
+//     const element = elements[index]
+//     let newFiber = null
+
+//     // TODO compare oldFiber to element
+
+//     if (oldFiber) {
+//       oldFiber = oldFiber.sibling
+//     const newFiber = {
+//       type: element.type,
+//       props: element.props,
+//       parent: wipFiber,
+//       dom: null,
+//     }
+
+//     if (index === 0) {
+//       wipFiber.child = newFiber
+//     } else if (element) {
+//     } else {
+//       prevSibling.sibling = newFiber
+//     }
+
+//     prevSibling = newFiber
+//     index++
+//   }
+
 function commitRoot() {
   commitWork(wipRoot?.child ?? null);
+  currentRoot = wipRoot;
   wipRoot = null;
 }
 

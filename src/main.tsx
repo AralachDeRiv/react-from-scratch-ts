@@ -12,11 +12,14 @@ const element = (
         /* Scope functionning on google */
           h2 {
             cursor: pointer;
-            color: red;
-            transition: all 0.3s linear;
+            color: red;      
         
-            &:hover {
-              color: blue
+            & span {
+              transition: all 0.3s linear;
+
+              &:hover{
+                color: blue
+              }     
             }
           }  
     `}
