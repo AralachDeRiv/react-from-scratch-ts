@@ -6,6 +6,8 @@ import {
   isDidactElementFiber,
   isTextElement,
   DidactElementFiber,
+  EffectTag,
+  TextElementFiber,
 } from "../types/type";
 
 // 1. Création des éléments
@@ -58,6 +60,7 @@ function createFiber(
   element: DidactElement | TextElement,
   parent: Fiber | null
 ): Fiber {
+  // console.log("Creating fiber for element:", element);
   if (isTextElement(element)) {
     return {
       type: element.type,
@@ -67,6 +70,7 @@ function createFiber(
       child: null,
       sibling: null,
       alternate: null,
+      effectTag: null,
     };
   } else {
     return {
@@ -77,6 +81,7 @@ function createFiber(
       child: null,
       sibling: null,
       alternate: null,
+      effectTag: null,
     };
   }
 }
@@ -85,6 +90,7 @@ function createFiber(
 let wipRoot: Fiber | null = null;
 let nextUnitOfWork: Fiber | null = null;
 let currentRoot: Fiber | null = null;
+let deletions: Fiber[] = [];
 
 // 3. Rendu initial
 export function render(
@@ -99,15 +105,20 @@ export function render(
     child: null,
     sibling: null,
     alternate: currentRoot,
+    effectTag: null,
   };
 
   wipRoot.child = createFiber(element, wipRoot);
+
   wipRoot.dom = container;
+  deletions = [];
   nextUnitOfWork = wipRoot;
 }
 
 // 4. Gestion du DOM et des Fibers
 export function createDom(fiber: Fiber) {
+  // console.log("Create Dom", fiber);
+
   const dom =
     fiber.type == ElementType.TEXT_ELEMENT
       ? document.createTextNode("")
@@ -146,6 +157,83 @@ export function createDom(fiber: Fiber) {
   return dom;
 }
 
+// TODO : Revenir ici, facturé cette fonction
+export function updateDom(
+  dom: HTMLElement | Text,
+  prevProps: Record<string, any>,
+  nextProps: Record<string, any>
+) {
+  // TODO : voir ici pour les event si pas de meilleur façon de faire
+  const isEvent = (key: string) => key.startsWith("on");
+  const isProperty = (key: string) => key !== "children" && !isEvent(key);
+  const isNew =
+    (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
+      prev[key] !== next[key];
+  const isGone =
+    (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
+      !(key in next);
+
+  Object.keys(prevProps)
+    .filter(isProperty)
+    .filter(isGone(prevProps, nextProps))
+    .forEach((name) => {
+      // Enlever la propriété sur le DOM
+      if (name === "style" && dom instanceof HTMLElement) {
+        Object.assign(dom.style, {});
+      } else if (name in dom) {
+        (dom as any)[name] = ""; // Réinitialiser l'attribut
+      } else if (!(dom instanceof Text)) {
+        dom.removeAttribute(name); // Retirer l'attribut du DOM
+      }
+    });
+
+  Object.keys(nextProps)
+    .filter(isProperty) // Ignore "children"
+    .filter(isNew(prevProps, nextProps)) // Filtrer les propriétés nouvelles ou modifiées
+    .forEach((name) => {
+      const value = nextProps[name];
+
+      if (
+        name === "style" &&
+        typeof value === "object" &&
+        dom instanceof HTMLElement
+      ) {
+        // Si la propriété est 'style' et que c'est un objet, on l'applique au DOM
+        Object.assign(dom.style, value as Record<string, string>);
+      } else if (name in dom) {
+        // Si la propriété existe sur l'élément DOM (par exemple, 'className', 'value', etc.)
+        (dom as any)[name] = value;
+      } else if (!(dom instanceof Text)) {
+        // Sinon, on utilise `setAttribute` pour définir la propriété (par exemple, 'id', 'data-*', etc.)
+        dom.setAttribute(name, value);
+      }
+    });
+
+  // Pour les props Event
+  // Remove
+  Object.keys(prevProps)
+    .filter(isEvent)
+    .filter((key) => !(key in nextProps) || isNew(prevProps, nextProps)(key))
+    .forEach((name) => {
+      const eventType = name.toLowerCase().substring(2);
+      dom.removeEventListener(eventType, prevProps[name]);
+    });
+
+  // Add
+  Object.keys(nextProps)
+    .filter(isEvent)
+    .filter(isNew(prevProps, nextProps))
+    .forEach((name) => {
+      const eventType = name.toLowerCase().substring(2);
+      dom.addEventListener(eventType, nextProps[name]);
+    });
+
+  if (dom instanceof Text && nextProps.nodeValue !== prevProps.nodeValue) {
+    // Si c'est un noeud texte et que la valeur a changé
+    dom.nodeValue = nextProps.nodeValue;
+  }
+}
+
 export function performUnitOfWork(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
@@ -166,65 +254,65 @@ export function performUnitOfWork(fiber: Fiber) {
     }
     nextFiber = nextFiber.parent;
   }
+
+  return null;
 }
 
 function reconcileChildren(fiber: DidactElementFiber) {
   const elements = fiber.props.children;
   let index = 0;
+  let oldFiber = fiber.alternate && fiber.alternate.child;
   let prevSibling: Fiber | null = null;
 
-  while (index < elements.length) {
+  while (index < elements.length || oldFiber != null) {
+    let newFiber: Fiber | null = null;
     const element = elements[index];
-    const newFiber: Fiber = createFiber(element, fiber);
+    const sameType = oldFiber && element && element.type == oldFiber.type;
+
+    if (sameType && oldFiber) {
+      newFiber = {
+        type: oldFiber.type,
+        props: element.props,
+        dom: oldFiber.dom,
+        parent: fiber,
+        alternate: oldFiber,
+        effectTag: EffectTag.UPDATE,
+      } as DidactElementFiber | TextElementFiber;
+    }
+    if (element && !sameType) {
+      newFiber = {
+        type: element.type,
+        props: element.props,
+        dom: null,
+        parent: fiber,
+        alternate: null,
+        effectTag: EffectTag.PLACEMENT,
+      } as DidactElementFiber | TextElementFiber;
+    }
+    if (oldFiber && !sameType) {
+      oldFiber.effectTag = EffectTag.DELETION;
+      deletions.push(oldFiber);
+    }
+
+    if (oldFiber) {
+      oldFiber = oldFiber.sibling;
+    }
 
     if (index === 0) {
       fiber.child = newFiber;
-    } else if (prevSibling) {
-      prevSibling.sibling = newFiber;
+    } else if (element) {
+      prevSibling!.sibling = newFiber;
     }
 
     prevSibling = newFiber;
     index++;
+
+    console.log(fiber);
   }
 }
 
-// function reconcileChildren(wipFiber, elements) {
-//   let index = 0
-//   let oldFiber =
-//     wipFiber.alternate && wipFiber.alternate.child
-//   let prevSibling = null
-
-//   while (
-//     index < elements.length ||
-//     oldFiber != null
-//   ) {
-//   while (index < elements.length) {
-//     const element = elements[index]
-//     let newFiber = null
-
-//     // TODO compare oldFiber to element
-
-//     if (oldFiber) {
-//       oldFiber = oldFiber.sibling
-//     const newFiber = {
-//       type: element.type,
-//       props: element.props,
-//       parent: wipFiber,
-//       dom: null,
-//     }
-
-//     if (index === 0) {
-//       wipFiber.child = newFiber
-//     } else if (element) {
-//     } else {
-//       prevSibling.sibling = newFiber
-//     }
-
-//     prevSibling = newFiber
-//     index++
-//   }
-
 function commitRoot() {
+  deletions.forEach(commitWork);
   commitWork(wipRoot?.child ?? null);
   currentRoot = wipRoot;
   wipRoot = null;
@@ -240,7 +328,15 @@ function commitWork(fiber: Fiber | null) {
     domParent instanceof HTMLElement &&
     (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text)
   ) {
-    domParent.appendChild(fiber.dom);
+    if (fiber.effectTag == EffectTag.PLACEMENT) {
+      domParent.appendChild(fiber.dom);
+    } else if (fiber.effectTag == EffectTag.DELETION) {
+      domParent.removeChild(fiber.dom);
+    } else if (fiber.effectTag == EffectTag.UPDATE) {
+      const props = fiber?.alternate?.props ?? {};
+
+      updateDom(fiber.dom, props, fiber.props);
+    }
   }
 
   commitWork(fiber.child);
@@ -254,7 +350,6 @@ function workLoop(deadline: IdleDeadline) {
     if (nextUnitOfWork) {
       nextUnitOfWork = performUnitOfWork(nextUnitOfWork) ?? null;
     }
-
     shouldYield = deadline.timeRemaining() < 1;
   }
 

@@ -1,6 +1,13 @@
+// ENUMS
 export enum ElementType {
   TEXT_ELEMENT = "TEXT_ELEMENT",
   ROOT = "ROOT",
+}
+
+export enum EffectTag {
+  UPDATE = "UPDATE",
+  PLACEMENT = "PLACEMENT",
+  DELETION = "DELETION",
 }
 
 // ELEMENTS
@@ -33,6 +40,8 @@ export type FiberBase = {
   parent: Fiber | null;
   child: Fiber | null;
   sibling: Fiber | null;
+  alternate: Fiber | null;
+  effectTag: EffectTag | null;
 };
 
 export type FiberWithElement<T> = T & FiberBase;
