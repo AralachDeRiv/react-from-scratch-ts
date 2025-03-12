@@ -38,9 +38,26 @@ const updateValue = (e: Event) => {
 
 const rerender = (value: string) => {
   const element = (
-    <div>
-      <input onInput={updateValue} value={value} />
-      <h2>Hello {value}</h2>
+    <div class="ok">
+      <div class="okok">
+        <input onInput={updateValue} value={value} />
+        <h2>Hello {value}</h2>
+      </div>
+      <h1>YO</h1>
+      <style>
+        {`
+        /* Scope functionning on google */
+           h2 {
+            cursor: pointer;
+             color: red;
+            transition: all 0.3s linear;
+             &:hover{
+               color: blue
+              }
+           
+          }
+      `}
+      </style>
     </div>
   );
   Didact.render(element, container);

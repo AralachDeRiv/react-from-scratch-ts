@@ -97,6 +97,8 @@ export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
 ) {
+  console.log(element);
+
   wipRoot = {
     type: ElementType.ROOT,
     props: { children: [element] },
@@ -345,6 +347,8 @@ function workLoop(deadline: IdleDeadline) {
   let shouldYield = false;
   while (nextUnitOfWork && !shouldYield) {
     if (nextUnitOfWork) {
+      console.log(nextUnitOfWork);
+
       nextUnitOfWork = performUnitOfWork(nextUnitOfWork) ?? null;
     }
     shouldYield = deadline.timeRemaining() < 1;
