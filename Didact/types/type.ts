@@ -1,5 +1,6 @@
 export enum ElementType {
   TEXT_ELEMENT = "TEXT_ELEMENT",
+  ROOT = "ROOT",
 }
 
 // ELEMENTS
@@ -37,7 +38,13 @@ export type FiberBase = {
 export type FiberWithElement<T> = T & FiberBase;
 export type DidactElementFiber = FiberWithElement<DidactElement>;
 export type TextElementFiber = FiberWithElement<TextElement>;
-export type Fiber = DidactElementFiber | TextElementFiber;
+
+export type FiberRoot = {
+  type: ElementType.ROOT;
+  props: { children: (DidactElement | TextElement)[] };
+} & FiberBase;
+
+export type Fiber = FiberRoot | DidactElementFiber | TextElementFiber;
 
 export function isDidactElementFiber(
   fiber: Fiber

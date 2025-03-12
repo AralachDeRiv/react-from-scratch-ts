@@ -1,40 +1,3 @@
-// export function render(
-//   element: DidactElement | TextElement,
-//   container: HTMLElement
-// ) {
-//   const dom =
-//     element.type == ElementType.TEXT_ELEMENT
-//       ? document.createTextNode("")
-//       : document.createElement(element.type);
-
-//   if (element.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
-//     element.props.children.forEach((child) => render(child, dom));
-
-//     const isProperty = (key: string) => key !== "children";
-//     Object.keys(element.props)
-//       .filter(isProperty)
-//       .forEach((name) => {
-//         // Si la propriété est 'style', on la gère différemment
-//         if (name === "style" && typeof element.props[name] === "object") {
-//           const styles = element.props[name] as Record<string, string>;
-//           Object.assign(dom.style, styles);
-//         } else if (name in dom) {
-//           (dom as any)[name] = element.props[name];
-//         } else {
-//           dom.setAttribute(name, element.props[name]);
-//         }
-//       });
-//   }
-
-//   if (element.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
-//     dom.nodeValue = element.props.nodeValue;
-//   }
-
-//   container.appendChild(dom);
-// }
-
-// START
-
 import {
   DidactElement,
   TextElement,
@@ -44,6 +7,7 @@ import {
   isTextElement,
 } from "../types/type";
 
+// 1. Création des éléments
 // TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
 export function createElement(
   type: keyof HTMLElementTagNameMap,
@@ -88,72 +52,6 @@ export function createTextElement(text: string | number): TextElement {
   };
 }
 
-let wipRoot: Fiber | null = null;
-let nextUnitOfWork: Fiber | null = null;
-
-export function render(
-  element: DidactElement | TextElement,
-  container: HTMLElement
-) {
-  wipRoot = createFiber(element, null);
-  wipRoot.dom = container;
-
-  nextUnitOfWork = wipRoot;
-}
-
-function commitRoot() {
-  commitWork(wipRoot?.child ?? null);
-  wipRoot = null;
-}
-
-function commitWork(fiber: Fiber | null) {
-  if (!fiber) {
-    return;
-  }
-  const domParent = fiber?.parent?.dom ?? null;
-
-  if (
-    domParent instanceof HTMLElement &&
-    (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text)
-  ) {
-    domParent.appendChild(fiber.dom);
-  }
-
-  commitWork(fiber.child);
-  commitWork(fiber.sibling);
-}
-
-export function createDom(fiber: Fiber) {
-  const dom =
-    fiber.type == ElementType.TEXT_ELEMENT
-      ? document.createTextNode("")
-      : document.createElement(fiber.type);
-
-  if (fiber.type !== ElementType.TEXT_ELEMENT && dom instanceof HTMLElement) {
-    const isProperty = (key: string) => key !== "children";
-
-    Object.keys(fiber.props)
-      .filter(isProperty)
-      .forEach((name) => {
-        // Si la propriété est 'style', on la gère différemment
-        if (name === "style" && typeof fiber.props[name] === "object") {
-          const styles = fiber.props[name] as Record<string, string>;
-          Object.assign(dom.style, styles);
-        } else if (name in dom) {
-          (dom as any)[name] = fiber.props[name];
-        } else {
-          dom.setAttribute(name, fiber.props[name]);
-        }
-      });
-  }
-
-  if (fiber.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
-    dom.nodeValue = fiber.props.nodeValue;
-  }
-
-  return dom;
-}
-
 // TODO : Pt un moyen de rendre ceci + élégant
 function createFiber(
   element: DidactElement | TextElement,
@@ -180,12 +78,69 @@ function createFiber(
   }
 }
 
+// 2. Variables globales
+let wipRoot: Fiber | null = null;
+let nextUnitOfWork: Fiber | null = null;
+
+// 3. Rendu initial
+export function render(
+  element: DidactElement | TextElement,
+  container: HTMLElement
+) {
+  wipRoot = {
+    type: ElementType.ROOT,
+    props: { children: [element] },
+    dom: container,
+    parent: null,
+    child: null,
+    sibling: null,
+  };
+
+  wipRoot.child = createFiber(element, wipRoot);
+  wipRoot.dom = container;
+  nextUnitOfWork = wipRoot;
+}
+
+// 4. Gestion du DOM et des Fibers
+export function createDom(fiber: Fiber) {
+  const dom =
+    fiber.type == ElementType.TEXT_ELEMENT
+      ? document.createTextNode("")
+      : document.createElement(fiber.type);
+
+  if (
+    fiber.type !== ElementType.TEXT_ELEMENT &&
+    fiber.type !== ElementType.ROOT &&
+    dom instanceof HTMLElement
+  ) {
+    const isProperty = (key: string) => key !== "children";
+
+    Object.keys(fiber.props)
+      .filter(isProperty)
+      .forEach((name) => {
+        // Si la propriété est 'style', on la gère différemment
+        if (name === "style" && typeof fiber.props[name] === "object") {
+          const styles = fiber.props[name] as Record<string, string>;
+          Object.assign(dom.style, styles);
+        } else if (name in dom) {
+          (dom as any)[name] = fiber.props[name];
+        } else {
+          dom.setAttribute(name, fiber.props[name]);
+        }
+      });
+  }
+
+  if (fiber.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
+    dom.nodeValue = fiber.props.nodeValue;
+  }
+
+  return dom;
+}
+
 export function performUnitOfWork(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
-
-  console.log(fiber);
 
   if (isDidactElementFiber(fiber)) {
     const elements = fiber.props.children;
@@ -220,6 +175,29 @@ export function performUnitOfWork(fiber: Fiber) {
   }
 }
 
+function commitRoot() {
+  commitWork(wipRoot?.child ?? null);
+  wipRoot = null;
+}
+
+function commitWork(fiber: Fiber | null) {
+  if (!fiber) {
+    return;
+  }
+  const domParent = fiber?.parent?.dom ?? null;
+
+  if (
+    domParent instanceof HTMLElement &&
+    (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text)
+  ) {
+    domParent.appendChild(fiber.dom);
+  }
+
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
+
+// 5. Boucle de travail
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false;
   while (nextUnitOfWork && !shouldYield) {
@@ -232,6 +210,7 @@ function workLoop(deadline: IdleDeadline) {
 
   if (!nextUnitOfWork && wipRoot) {
     commitRoot();
+    console.log("Commit phase:", wipRoot);
   }
 
   requestIdleCallback(workLoop);
