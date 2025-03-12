@@ -108,6 +108,10 @@ export function createDom(fiber: Fiber) {
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
+  if (fiber.type === "style") {
+    console.log(fiber);
+  }
+
   if (
     fiber.type !== ElementType.TEXT_ELEMENT &&
     fiber.type !== ElementType.ROOT &&
@@ -210,7 +214,6 @@ function workLoop(deadline: IdleDeadline) {
 
   if (!nextUnitOfWork && wipRoot) {
     commitRoot();
-    console.log("Commit phase:", wipRoot);
   }
 
   requestIdleCallback(workLoop);
