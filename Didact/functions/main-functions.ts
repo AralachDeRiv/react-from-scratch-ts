@@ -138,6 +138,9 @@ export function createDom(fiber: Fiber) {
         if (name === "style" && typeof fiber.props[name] === "object") {
           const styles = fiber.props[name] as Record<string, string>;
           Object.assign(dom.style, styles);
+        } else if (name.startsWith("on")) {
+          const eventType = name.toLowerCase().substring(2);
+          dom.addEventListener(eventType, fiber.props[name]);
         } else if (name in dom) {
           (dom as any)[name] = fiber.props[name];
         } else {
