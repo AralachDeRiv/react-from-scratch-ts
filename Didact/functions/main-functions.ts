@@ -118,11 +118,27 @@ export function render(
 }
 
 // 4. Gestion du DOM et des Fibers
-export function createDom(fiber: Fiber) {
-  // console.log("Create Dom", fiber);
 
+// Fonction utilitaire pour détecter si une clé est un événement
+const isEvent = (key: string) => key.startsWith("on");
+
+// Fonction utilitaire pour détecter si une clé est une propriété du DOM (hors événements et "children")
+const isProperty = (key: string) => key !== "children" && !isEvent(key);
+
+// Détecte si une propriété est nouvelle ou modifiée
+const isNew =
+  (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
+    prev[key] !== next[key];
+
+// Détecte si une propriété a disparu
+const isGone =
+  (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
+    !(key in next);
+
+// Création du DOM pour un élément donné
+export function createDom(fiber: Fiber): HTMLElement | Text {
   const dom =
-    fiber.type == ElementType.TEXT_ELEMENT
+    fiber.type === ElementType.TEXT_ELEMENT
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
@@ -131,66 +147,60 @@ export function createDom(fiber: Fiber) {
     fiber.type !== ElementType.ROOT &&
     dom instanceof HTMLElement
   ) {
-    const isProperty = (key: string) => key !== "children";
-
-    Object.keys(fiber.props)
-      .filter(isProperty)
-      .forEach((name) => {
-        // Si la propriété est 'style', on la gère différemment
-        if (name === "style" && typeof fiber.props[name] === "object") {
-          const styles = fiber.props[name] as Record<string, string>;
-          Object.assign(dom.style, styles);
-        } else if (name.startsWith("on")) {
-          const eventType = name.toLowerCase().substring(2);
-          dom.addEventListener(eventType, fiber.props[name]);
-        } else if (name in dom) {
-          (dom as any)[name] = fiber.props[name];
-        } else {
-          dom.setAttribute(name, fiber.props[name]);
-        }
-      });
+    updateNewProperties(dom, {}, fiber.props);
   }
 
-  if (fiber.type == ElementType.TEXT_ELEMENT && dom instanceof Text) {
+  if (fiber.type === ElementType.TEXT_ELEMENT && dom instanceof Text) {
     dom.nodeValue = fiber.props.nodeValue;
   }
 
   return dom;
 }
 
-// TODO : Revenir ici, facturé cette fonction
+// Met à jour les propriétés du DOM (ajout/suppression des attributs, styles, événements)
 export function updateDom(
   dom: HTMLElement | Text,
   prevProps: Record<string, any>,
   nextProps: Record<string, any>
 ) {
-  // TODO : voir ici pour les event si pas de meilleur façon de faire
-  const isEvent = (key: string) => key.startsWith("on");
-  const isProperty = (key: string) => key !== "children" && !isEvent(key);
-  const isNew =
-    (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
-      prev[key] !== next[key];
-  const isGone =
-    (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
-      !(key in next);
+  removeOldProperties(dom, prevProps, nextProps);
+  updateNewProperties(dom, prevProps, nextProps);
+  updateEvents(dom, prevProps, nextProps);
 
+  if (dom instanceof Text && nextProps.nodeValue !== prevProps.nodeValue) {
+    dom.nodeValue = nextProps.nodeValue;
+  }
+}
+
+// Supprime les anciennes propriétés du DOM qui ne sont plus présentes
+function removeOldProperties(
+  dom: HTMLElement | Text,
+  prevProps: Record<string, any>,
+  nextProps: Record<string, any>
+) {
   Object.keys(prevProps)
     .filter(isProperty)
     .filter(isGone(prevProps, nextProps))
     .forEach((name) => {
-      // Enlever la propriété sur le DOM
       if (name === "style" && dom instanceof HTMLElement) {
-        Object.assign(dom.style, {});
+        dom.style.cssText = "";
       } else if (name in dom) {
-        (dom as any)[name] = ""; // Réinitialiser l'attribut
+        (dom as any)[name] = "";
       } else if (!(dom instanceof Text)) {
-        dom.removeAttribute(name); // Retirer l'attribut du DOM
+        dom.removeAttribute(name);
       }
     });
+}
 
+// Ajoute ou met à jour les nouvelles propriétés du DOM
+function updateNewProperties(
+  dom: HTMLElement | Text,
+  prevProps: Record<string, any>,
+  nextProps: Record<string, any>
+) {
   Object.keys(nextProps)
-    .filter(isProperty) // Ignore "children"
-    .filter(isNew(prevProps, nextProps)) // Filtrer les propriétés nouvelles ou modifiées
+    .filter(isProperty)
+    .filter(isNew(prevProps, nextProps))
     .forEach((name) => {
       const value = nextProps[name];
 
@@ -199,19 +209,21 @@ export function updateDom(
         typeof value === "object" &&
         dom instanceof HTMLElement
       ) {
-        // Si la propriété est 'style' et que c'est un objet, on l'applique au DOM
-        Object.assign(dom.style, value as Record<string, string>);
+        Object.assign(dom.style, value);
       } else if (name in dom) {
-        // Si la propriété existe sur l'élément DOM (par exemple, 'className', 'value', etc.)
         (dom as any)[name] = value;
       } else if (!(dom instanceof Text)) {
-        // Sinon, on utilise `setAttribute` pour définir la propriété (par exemple, 'id', 'data-*', etc.)
         dom.setAttribute(name, value);
       }
     });
+}
 
-  // Pour les props Event
-  // Remove
+// Ajoute ou supprime les événements
+function updateEvents(
+  dom: HTMLElement | Text,
+  prevProps: Record<string, any>,
+  nextProps: Record<string, any>
+) {
   Object.keys(prevProps)
     .filter(isEvent)
     .filter((key) => !(key in nextProps) || isNew(prevProps, nextProps)(key))
@@ -220,7 +232,6 @@ export function updateDom(
       dom.removeEventListener(eventType, prevProps[name]);
     });
 
-  // Add
   Object.keys(nextProps)
     .filter(isEvent)
     .filter(isNew(prevProps, nextProps))
@@ -228,11 +239,6 @@ export function updateDom(
       const eventType = name.toLowerCase().substring(2);
       dom.addEventListener(eventType, nextProps[name]);
     });
-
-  if (dom instanceof Text && nextProps.nodeValue !== prevProps.nodeValue) {
-    // Si c'est un noeud texte et que la valeur a changé
-    dom.nodeValue = nextProps.nodeValue;
-  }
 }
 
 export function performUnitOfWork(fiber: Fiber) {
