@@ -124,10 +124,6 @@ export function createDom(fiber: Fiber) {
       ? document.createTextNode("")
       : document.createElement(fiber.type);
 
-  if (fiber.type === "style") {
-    console.log(fiber);
-  }
-
   if (
     fiber.type !== ElementType.TEXT_ELEMENT &&
     fiber.type !== ElementType.ROOT &&
@@ -306,8 +302,6 @@ function reconcileChildren(fiber: DidactElementFiber) {
 
     prevSibling = newFiber;
     index++;
-
-    console.log(fiber);
   }
 }
 
