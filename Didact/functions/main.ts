@@ -1,4 +1,4 @@
-import { ifError } from "assert";
+import { error } from "console";
 import {
   DidactElement,
   DidactElementFiber,
@@ -114,8 +114,6 @@ export function render(
   };
 
   wipRoot.child = createFiber(element, wipRoot);
-
-  wipRoot.dom = container;
   deletions = [];
   nextUnitOfWork = wipRoot;
 }
@@ -124,6 +122,12 @@ export function render(
 
 // Création du DOM pour un élément donné
 export function createDom(fiber: Fiber): HTMLElement | Text {
+  if (
+    !(fiber.type === ElementType.TEXT_ELEMENT || typeof fiber.type === "string")
+  ) {
+    throw Error("Error");
+  }
+
   const dom =
     fiber.type === ElementType.TEXT_ELEMENT
       ? document.createTextNode("")
@@ -160,13 +164,33 @@ export function updateDom(
   }
 }
 
-export function performUnitOfWork(fiber: Fiber) {
+function updateHostComponent(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
 
   if (isDidactElementFiber(fiber)) {
-    reconcileChildren(fiber);
+    const elements = fiber.props.children;
+    reconcileChildren(fiber, elements);
+  }
+}
+
+function updateFunctionComponent(fiber: Fiber) {
+  if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
+    throw Error("Error");
+  const children = [fiber.type(fiber.props)];
+  console.log(children);
+
+  reconcileChildren(fiber, children);
+}
+
+export function performUnitOfWork(fiber: Fiber) {
+  const isFunctionComponent = fiber.type instanceof Function;
+
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostComponent(fiber);
   }
 
   if (fiber.child) {
@@ -184,8 +208,14 @@ export function performUnitOfWork(fiber: Fiber) {
   return null;
 }
 
-function reconcileChildren(fiber: DidactElementFiber) {
-  const elements = fiber.props.children;
+// Revoir plus précisément comment fonctionne ceci
+function reconcileChildren(
+  fiber: DidactElementFiber,
+  elements: (
+    | DidactElement<Function | keyof HTMLElementTagNameMap>
+    | TextElement
+  )[]
+) {
   let index = 0;
   let oldFiber = fiber.alternate && fiber.alternate.child;
   let prevSibling: Fiber | null = null;
@@ -246,7 +276,13 @@ function commitWork(fiber: Fiber | null) {
   if (!fiber) {
     return;
   }
-  const domParent = fiber?.parent?.dom ?? null;
+  let domParentFiber = fiber?.parent ?? null;
+
+  // let domParentFiber = fiber.parent
+  while (!domParentFiber?.dom) {
+    domParentFiber = domParentFiber?.parent ?? null;
+  }
+  const domParent = domParentFiber.dom;
 
   if (
     domParent instanceof HTMLElement &&
@@ -255,16 +291,30 @@ function commitWork(fiber: Fiber | null) {
     if (fiber.effectTag == EffectTag.PLACEMENT) {
       domParent.appendChild(fiber.dom);
     } else if (fiber.effectTag == EffectTag.DELETION) {
-      domParent.removeChild(fiber.dom);
+      commitDeletion(fiber.child, domParent);
     } else if (fiber.effectTag == EffectTag.UPDATE) {
       const props = fiber?.alternate?.props ?? {};
-
       updateDom(fiber.dom, props, fiber.props);
     }
   }
 
   commitWork(fiber.child);
   commitWork(fiber.sibling);
+}
+
+// TODO : Refaire toute l'implémentation des fonctions
+function commitDeletion(fiber: Fiber | null, domParent: HTMLElement | Text) {
+  if (!fiber) return;
+  if (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text) {
+    domParent.removeChild(fiber.dom);
+  } else {
+    // 🔽 Descend récursivement jusqu'à trouver un élément DOM à supprimer
+    let child = fiber.child;
+    while (child) {
+      commitDeletion(child, domParent);
+      child = child.sibling;
+    }
+  }
 }
 
 // 5. Boucle de travail

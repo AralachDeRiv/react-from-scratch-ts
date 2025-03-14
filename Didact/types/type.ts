@@ -12,7 +12,9 @@ export enum EffectTag {
 
 // ELEMENTS
 export type DidactElement<
-  T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNameMap
+  T extends keyof HTMLElementTagNameMap | Function =
+    | keyof HTMLElementTagNameMap
+    | Function
 > = {
   type: T;
   props: Partial<Record<string, any>> & {
