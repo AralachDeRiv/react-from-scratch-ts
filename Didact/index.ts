@@ -1,5 +1,5 @@
 // TODO : Commenter ici + réorganiser ce folder
-export * from "./functions/main-functions";
+export * from "./functions/main";
 
 // TODO : Expliquer ici
 export { jsxDEV } from "./jsx-dev-runtime";
