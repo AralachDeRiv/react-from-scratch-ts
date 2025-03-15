@@ -1,4 +1,3 @@
-import { error } from "console";
 import {
   DidactElement,
   DidactElementFiber,
@@ -42,6 +41,14 @@ export function createElement(
       return child;
     }
   );
+
+  console.log({
+    type,
+    props: {
+      ...restProps,
+      children: processedChildren,
+    },
+  });
 
   return {
     type,
@@ -278,7 +285,6 @@ function commitWork(fiber: Fiber | null) {
   }
   let domParentFiber = fiber?.parent ?? null;
 
-  // let domParentFiber = fiber.parent
   while (!domParentFiber?.dom) {
     domParentFiber = domParentFiber?.parent ?? null;
   }
