@@ -1,2 +1,2 @@
-import { createElement } from "./functions/main";
+import { createElement } from "./functions/utils";
 export { createElement as jsxDEV };
