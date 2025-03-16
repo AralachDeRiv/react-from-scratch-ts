@@ -74,13 +74,12 @@ function App({ name }: { name: string }) {
 }
 
 function Counter() {
-  const [count, setCount] = Didact.useState(0);
-
-  // console.log(count);
+  const [count, setCount] = Didact.useState(-10);
 
   return (
     <div>
-      <p>{count}</p>
+      {/* Ajuter des espaces */}
+      <p> {count} </p>
       <button onClick={() => setCount(() => count + 1)}>Click</button>
     </div>
   );
@@ -88,7 +87,6 @@ function Counter() {
 
 const element = (
   <div className="YO">
-    <App name="okoko" />
     <Counter />
   </div>
 );
