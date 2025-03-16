@@ -4,6 +4,8 @@ import {
   EffectTag,
   ElementType,
   Fiber,
+  FiberRoot,
+  hook,
   isDidactElementFiber,
   TextElement,
   TextElementFiber,
@@ -11,9 +13,9 @@ import {
 import { commitDeletion, createDom, createFiber, updateDom } from "./utils";
 
 // Variables globales
-let wipRoot: Fiber | null = null;
+let wipRoot: FiberRoot | null = null;
 let nextUnitOfWork: Fiber | null = null;
-let currentRoot: Fiber | null = null;
+let currentRoot: FiberRoot | null = null;
 let deletions: Fiber[] = [];
 
 //  Rendu initial
@@ -48,11 +50,58 @@ function updateHostComponent(fiber: Fiber) {
   }
 }
 
+let wipFiber: DidactElementFiber | null = null;
+let hookIndex: number | null = null;
+
 function updateFunctionComponent(fiber: Fiber) {
   if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
     throw Error("Error");
+  wipFiber = fiber;
+  hookIndex = 0;
+
   const children = [fiber.type(fiber.props)];
   reconcileChildren(fiber, children);
+}
+
+export function useState(initial: any) {
+  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+
+  const oldHook =
+    wipFiber &&
+    isDidactElementFiber(wipFiber?.alternate) &&
+    wipFiber.alternate?.hooks?.[hookIndex];
+
+  const hook: hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  };
+
+  const actions = oldHook ? oldHook.queue : [];
+  actions.forEach((action) => {
+    hook.state = action(hook.state);
+  });
+
+  const setState = (action: Function) => {
+    hook.queue.push(action);
+
+    wipRoot = {
+      ...wipRoot!,
+      dom: currentRoot!.dom,
+      props: currentRoot!.props,
+      alternate: currentRoot,
+    };
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+
+  if (!wipFiber.hooks) {
+    wipFiber.hooks = [];
+  }
+
+  wipFiber.hooks.push(hook);
+
+  hookIndex!++;
+  return [hook.state, setState];
 }
 
 export function performUnitOfWork(fiber: Fiber) {

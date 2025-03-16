@@ -179,7 +179,7 @@ export function createDom(fiber: Fiber): HTMLElement | Text {
   }
 
   if (fiber.type === ElementType.TEXT_ELEMENT && dom instanceof Text) {
-    dom.nodeValue = fiber.props.nodeValue;
+    dom.nodeValue = fiber.props.nodeValue ?? null;
   }
 
   return dom;

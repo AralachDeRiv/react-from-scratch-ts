@@ -25,7 +25,7 @@ export type DidactElement<
 export type TextElement = {
   type: ElementType.TEXT_ELEMENT;
   props: {
-    nodeValue: string;
+    nodeValue?: string;
     // N'aura pas d'enfants dans ce cas ci
   };
 };
@@ -46,19 +46,28 @@ export type FiberBase = {
   effectTag: EffectTag | null;
 };
 
+export type hook = {
+  state: any;
+  queue: Function[];
+};
+
 export type FiberWithElement<T> = T & FiberBase;
-export type DidactElementFiber = FiberWithElement<DidactElement>;
+export type DidactElementFiber = FiberWithElement<DidactElement> & {
+  hooks?: hook[];
+};
+
 export type TextElementFiber = FiberWithElement<TextElement>;
 
-export type FiberRoot = {
+export type FiberRoot = FiberBase & {
   type: ElementType.ROOT;
+  parent: null;
   props: { children: (DidactElement | TextElement)[] };
-} & FiberBase;
+};
 
 export type Fiber = FiberRoot | DidactElementFiber | TextElementFiber;
 
 export function isDidactElementFiber(
-  fiber: Fiber
+  fiber: Fiber | null
 ): fiber is DidactElementFiber {
-  return "children" in fiber.props;
+  return fiber !== null && "children" in fiber.props;
 }

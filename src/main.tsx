@@ -73,10 +73,23 @@ function App({ name }: { name: string }) {
   return <h1>Hi {name} okokok</h1>;
 }
 
+function Counter() {
+  const [count, setCount] = Didact.useState(0);
+
+  // console.log(count);
+
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(() => count + 1)}>Click</button>
+    </div>
+  );
+}
+
 const element = (
   <div className="YO">
     <App name="okoko" />
-    <App name="LLLL" />
+    <Counter />
   </div>
 );
 
