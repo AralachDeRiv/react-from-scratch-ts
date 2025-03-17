@@ -85,9 +85,34 @@ function Counter() {
   );
 }
 
+function Posts() {
+  const posts = ["post1", "post2", "post3"];
+
+  return (
+    <div>
+      {posts.map((post) => (
+        <div className="post">
+          <p>{post}</p>
+        </div>
+      ))}
+
+      <style>
+        {`
+        @scope{
+          p {
+          color: red         
+          }    
+        }    
+        `}
+      </style>
+    </div>
+  );
+}
 const element = (
   <div className="YO">
+    <App name="YOO" />
     <Counter />
+    <Posts />
   </div>
 );
 

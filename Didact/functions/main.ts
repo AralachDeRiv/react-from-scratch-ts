@@ -17,6 +17,8 @@ let wipRoot: FiberRoot | null = null;
 let nextUnitOfWork: Fiber | null = null;
 let currentRoot: FiberRoot | null = null;
 let deletions: Fiber[] = [];
+let wipFiber: DidactElementFiber | null = null;
+let hookIndex: number | null = null;
 
 //  Rendu initial
 export function render(
@@ -40,21 +42,15 @@ export function render(
 }
 
 function updateHostComponent(fiber: Fiber) {
-  console.log(fiber);
-
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
 
   if (isDidactElementFiber(fiber)) {
-    const elements = fiber.props.children;
-
+    const elements = fiber.props.children.flat();
     reconcileChildren(fiber, elements);
   }
 }
-
-let wipFiber: DidactElementFiber | null = null;
-let hookIndex: number | null = null;
 
 function updateFunctionComponent(fiber: Fiber) {
   if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
@@ -78,8 +74,6 @@ export function useState(initial: any) {
     state: oldHook ? oldHook.state : initial,
     queue: [],
   };
-
-  console.log("Initial count state:", hook.state);
 
   const actions = oldHook ? oldHook.queue : [];
 

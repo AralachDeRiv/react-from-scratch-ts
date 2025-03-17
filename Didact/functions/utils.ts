@@ -161,7 +161,9 @@ export function createDom(fiber: Fiber): HTMLElement | Text {
   if (
     !(fiber.type === ElementType.TEXT_ELEMENT || typeof fiber.type === "string")
   ) {
-    throw Error(`ERROR: NOT VALID FIBER : ${fiber}`);
+    console.log(fiber);
+
+    throw Error(`ERROR: NOT VALID FIBER`);
   }
 
   const dom =
