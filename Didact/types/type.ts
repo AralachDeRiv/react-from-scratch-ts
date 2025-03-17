@@ -72,6 +72,7 @@ export enum HookType {
   STATE = "state",
   EFFECT = "effect",
   REF = "ref",
+  CONTEXT = "context",
 }
 
 export type StateHook = {
@@ -92,4 +93,14 @@ export type EffectHook = {
   cleanup?: (() => void) | null;
 };
 
-export type hook = StateHook | EffectHook | RefHook;
+export type ContextType<T> = {
+  Provider: ({ value, children }: { value: T; children: any }) => any;
+  _currentValue: T;
+};
+
+export type ContextHook = {
+  type: HookType.CONTEXT;
+  state: any;
+};
+
+export type hook = StateHook | EffectHook | RefHook | ContextHook;

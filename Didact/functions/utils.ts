@@ -9,6 +9,7 @@ import {
 // ELEMENT CREATION
 // TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
 // TODO : Ajouter ici le @scope par défault pour les tag style ?
+
 export function createElement(
   type: keyof HTMLElementTagNameMap | Function,
   props: Record<string, any> | null,
@@ -82,7 +83,6 @@ export function createFiber(
 }
 
 // GESTION DOM
-
 const isEvent = (key: string) => key.startsWith("on");
 const isProperty = (key: string) => key !== "children" && !isEvent(key);
 const isNew =
@@ -162,7 +162,6 @@ export function createDom(fiber: Fiber): HTMLElement | Text {
     !(fiber.type === ElementType.TEXT_ELEMENT || typeof fiber.type === "string")
   ) {
     console.log(fiber);
-
     throw Error(`ERROR: NOT VALID FIBER`);
   }
 

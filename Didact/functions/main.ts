@@ -1,4 +1,6 @@
 import {
+  ContextHook,
+  ContextType,
   DidactElement,
   DidactElementFiber,
   EffectHook,
@@ -185,32 +187,32 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
   hookIndex!++;
 }
 
-function commitEffects() {
-  if (!currentRoot) return;
+export function useContext<T>(context: ContextType<T>): T {
+  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
 
-  function runEffects(fiber: Fiber | null) {
-    if (!fiber) return;
+  const oldHook =
+    wipFiber.alternate &&
+    isDidactElementFiber(wipFiber.alternate) &&
+    wipFiber.alternate.hooks?.[hookIndex];
 
-    if (isDidactElementFiber(fiber) && fiber.hooks) {
-      fiber.hooks.forEach((hook) => {
-        if (hook.type === HookType.EFFECT) {
-          // Exécuter le cleanup si défini
-          if (hook.cleanup) {
-            hook.cleanup();
-          }
-
-          const cleanupFn = hook.effect();
-          // Exécuter le nouvel effet et stocker son cleanup
-          hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
-        }
-      });
-    }
-
-    runEffects(fiber.child);
-    runEffects(fiber.sibling);
+  if (oldHook && oldHook.type !== HookType.CONTEXT) {
+    console.error("Error with oldHook inside useContext");
+    throw Error("Error with oldHook inside useContext");
   }
 
-  runEffects(currentRoot.child);
+  const hook: ContextHook = {
+    type: HookType.CONTEXT,
+    state: context._currentValue, // Valeur actuelle du contexte
+  };
+
+  if (!wipFiber.hooks) {
+    wipFiber.hooks = [];
+  }
+
+  wipFiber.hooks.push(hook);
+  hookIndex!++;
+
+  return hook.state;
 }
 
 export function performUnitOfWork(fiber: Fiber) {
@@ -291,6 +293,34 @@ function reconcileChildren(
     prevSibling = newFiber;
     index++;
   }
+}
+
+function commitEffects() {
+  if (!currentRoot) return;
+
+  function runEffects(fiber: Fiber | null) {
+    if (!fiber) return;
+
+    if (isDidactElementFiber(fiber) && fiber.hooks) {
+      fiber.hooks.forEach((hook) => {
+        if (hook.type === HookType.EFFECT) {
+          // Exécuter le cleanup si défini
+          if (hook.cleanup) {
+            hook.cleanup();
+          }
+
+          const cleanupFn = hook.effect();
+          // Exécuter le nouvel effet et stocker son cleanup
+          hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
+        }
+      });
+    }
+
+    runEffects(fiber.child);
+    runEffects(fiber.sibling);
+  }
+
+  runEffects(currentRoot.child);
 }
 
 function commitRefs(fiber: Fiber | null) {

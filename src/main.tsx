@@ -156,6 +156,37 @@ export function MyComponent() {
   );
 }
 
-const element = <MyComponent />;
+// Création d'un contexte pour le thème
+const ThemeContext = Didact.createContext("light");
+
+// Composant de l'application
+function Page() {
+  const [theme, setTheme] = Didact.useState("light");
+
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Header />
+      <button
+        onClick={() => setTheme(() => (theme === "light" ? "dark" : "light"))}
+      >
+        Toggle Theme
+      </button>
+    </ThemeContext.Provider>
+  );
+}
+
+function Header() {
+  const theme = Didact.useContext(ThemeContext); // Consommer le contexte du thème
+
+  return (
+    <header style={{ backgroundColor: theme === "light" ? "white" : "black" }}>
+      <h1 style={{ color: theme === "light" ? "black" : "white" }}>
+        Current theme: {theme}
+      </h1>
+    </header>
+  );
+}
+
+const element = <Page />;
 
 Didact.render(element, container);
