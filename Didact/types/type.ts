@@ -19,6 +19,7 @@ export type DidactElement<
   type: T;
   props: Partial<Record<string, any>> & {
     children: (DidactElement | TextElement)[];
+    ref?: any;
   };
 };
 
@@ -70,12 +71,18 @@ export function isDidactElementFiber(
 export enum HookType {
   STATE = "state",
   EFFECT = "effect",
+  REF = "ref",
 }
 
 export type StateHook = {
   type: HookType.STATE;
   state: any;
   queue: Function[];
+};
+
+export type RefHook = {
+  type: HookType.REF;
+  current: any;
 };
 
 export type EffectHook = {
@@ -85,4 +92,4 @@ export type EffectHook = {
   cleanup?: (() => void) | null;
 };
 
-export type hook = StateHook | EffectHook;
+export type hook = StateHook | EffectHook | RefHook;

@@ -109,6 +109,7 @@ function Counter() {
 
 function Posts() {
   const posts = ["post1", "post2", "post3"];
+  const blue = "blue";
 
   return (
     <div>
@@ -120,22 +121,41 @@ function Posts() {
 
       <style>
         {`
-        @scope{
-          p {
-          color: red         
+    
+          .post p {
+          color: ${blue}         
           }    
-        }    
+     
         `}
       </style>
     </div>
   );
 }
-const element = (
-  <div className="YO">
-    <App name="YOO" />
-    <Counter />
-    <Posts />
-  </div>
-);
+
+export function MyComponent() {
+  const [count, setCount] = Didact.useState(0);
+  const myInputRef = Didact.useRef(null);
+
+  const handleClick = () => {
+    setCount(() => count + 1);
+    // Accéder à la référence
+
+    // console.log(myInputRef);
+
+    if (myInputRef.current) {
+      console.log(myInputRef.current.value);
+    }
+  };
+
+  return (
+    <div>
+      <input ref={myInputRef} />
+      <button onClick={handleClick}>Increment</button>
+      <p>{count}</p>
+    </div>
+  );
+}
+
+const element = <MyComponent />;
 
 Didact.render(element, container);

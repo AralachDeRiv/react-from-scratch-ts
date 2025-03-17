@@ -6,9 +6,9 @@ import {
   ElementType,
   Fiber,
   FiberRoot,
-  hook,
   HookType,
   isDidactElementFiber,
+  RefHook,
   StateHook,
   TextElement,
   TextElementFiber,
@@ -112,6 +112,38 @@ export function useState(initial: any) {
 
   hookIndex!++;
   return [hook.state, setState];
+}
+
+export function useRef(initial: any) {
+  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+
+  const oldHook =
+    wipFiber &&
+    isDidactElementFiber(wipFiber?.alternate) &&
+    wipFiber.alternate?.hooks?.[hookIndex];
+
+  if (oldHook && oldHook.type !== HookType.REF) {
+    console.error("Error on oldHook type in useRef", oldHook);
+    throw Error("Error on oldHook type in useRef");
+  }
+
+  console.log(oldHook);
+
+  // Créer le hook de référence
+  const hook: RefHook = {
+    type: HookType.REF,
+    current: oldHook ? oldHook.current : initial, // Valeur initiale ou ancienne valeur
+  };
+
+  // Si ce n'est pas la première fois, on utilise le hook actuel
+  if (!wipFiber.hooks) {
+    wipFiber.hooks = [];
+  }
+
+  wipFiber.hooks.push(hook);
+  hookIndex!++;
+
+  return hook;
 }
 
 export function useEffect(effect: () => void | (() => void), deps: any[]) {
@@ -261,12 +293,22 @@ function reconcileChildren(
   }
 }
 
+function commitRefs(fiber: Fiber | null) {
+  if (!fiber || !isDidactElementFiber(fiber)) return;
+  if (fiber.props.ref && fiber.dom) {
+    fiber.props.ref.current = fiber.dom;
+  }
+  commitRefs(fiber.child);
+  commitRefs(fiber.sibling);
+}
+
 function commitRoot() {
   deletions.forEach(commitWork);
   commitWork(wipRoot?.child ?? null);
   currentRoot = wipRoot;
 
   commitEffects();
+  commitRefs(currentRoot?.child ?? null);
 
   wipRoot = null;
 }
