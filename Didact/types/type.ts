@@ -26,7 +26,6 @@ export type TextElement = {
   type: ElementType.TEXT_ELEMENT;
   props: {
     nodeValue?: string;
-    // N'aura pas d'enfants dans ce cas ci
   };
 };
 
@@ -44,11 +43,6 @@ export type FiberBase = {
   sibling: Fiber | null;
   alternate: Fiber | null;
   effectTag: EffectTag | null;
-};
-
-export type hook = {
-  state: any;
-  queue: Function[];
 };
 
 export type FiberWithElement<T> = T & FiberBase;
@@ -71,3 +65,24 @@ export function isDidactElementFiber(
 ): fiber is DidactElementFiber {
   return fiber !== null && "children" in fiber.props;
 }
+
+// HOOKS
+export enum HookType {
+  STATE = "state",
+  EFFECT = "effect",
+}
+
+export type StateHook = {
+  type: HookType.STATE;
+  state: any;
+  queue: Function[];
+};
+
+export type EffectHook = {
+  type: HookType.EFFECT;
+  effect: () => void | (() => void);
+  deps: any[];
+  cleanup?: (() => void) | null;
+};
+
+export type hook = StateHook | EffectHook;

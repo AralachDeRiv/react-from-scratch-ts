@@ -1,12 +1,15 @@
 import {
   DidactElement,
   DidactElementFiber,
+  EffectHook,
   EffectTag,
   ElementType,
   Fiber,
   FiberRoot,
   hook,
+  HookType,
   isDidactElementFiber,
+  StateHook,
   TextElement,
   TextElementFiber,
 } from "../types/type";
@@ -70,14 +73,20 @@ export function useState(initial: any) {
     isDidactElementFiber(wipFiber?.alternate) &&
     wipFiber.alternate?.hooks?.[hookIndex];
 
-  const hook: hook = {
+  if (oldHook && oldHook.type !== HookType.STATE) {
+    console.error("Problem with this oldHook : ", oldHook);
+    throw Error("Problem with oldHook inside useState");
+  }
+
+  const hook: StateHook = {
+    type: HookType.STATE,
     state: oldHook ? oldHook.state : initial,
     queue: [],
   };
 
   const actions = oldHook ? oldHook.queue : [];
 
-  actions.forEach((action) => {
+  actions!.forEach((action) => {
     hook.state = action(hook.state);
   });
 
@@ -103,6 +112,73 @@ export function useState(initial: any) {
 
   hookIndex!++;
   return [hook.state, setState];
+}
+
+export function useEffect(effect: () => void | (() => void), deps: any[]) {
+  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+
+  const oldHook =
+    wipFiber.alternate &&
+    isDidactElementFiber(wipFiber.alternate) &&
+    wipFiber.alternate.hooks?.[hookIndex];
+
+  if (oldHook && oldHook.type !== HookType.EFFECT) {
+    console.error("Problem with this oldHook : ", oldHook);
+    throw Error("Problem with oldHook inside useState");
+  }
+
+  const hasChanged =
+    !oldHook || !deps || deps.some((dep, i) => dep !== oldHook.deps![i]);
+
+  let cleanup: (() => void) | null | undefined;
+
+  if (hasChanged && oldHook && oldHook.cleanup) {
+    cleanup = oldHook.cleanup;
+  } else {
+    cleanup = null;
+  }
+
+  const hook: EffectHook = {
+    type: HookType.EFFECT,
+    effect,
+    deps,
+    cleanup: cleanup,
+  };
+
+  if (!wipFiber.hooks) {
+    wipFiber.hooks = [];
+  }
+
+  wipFiber.hooks.push(hook);
+  hookIndex!++;
+}
+
+function commitEffects() {
+  if (!currentRoot) return;
+
+  function runEffects(fiber: Fiber | null) {
+    if (!fiber) return;
+
+    if (isDidactElementFiber(fiber) && fiber.hooks) {
+      fiber.hooks.forEach((hook) => {
+        if (hook.type === HookType.EFFECT) {
+          // Exécuter le cleanup si défini
+          if (hook.cleanup) {
+            hook.cleanup();
+          }
+
+          const cleanupFn = hook.effect();
+          // Exécuter le nouvel effet et stocker son cleanup
+          hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
+        }
+      });
+    }
+
+    runEffects(fiber.child);
+    runEffects(fiber.sibling);
+  }
+
+  runEffects(currentRoot.child);
 }
 
 export function performUnitOfWork(fiber: Fiber) {
@@ -189,6 +265,9 @@ function commitRoot() {
   deletions.forEach(commitWork);
   commitWork(wipRoot?.child ?? null);
   currentRoot = wipRoot;
+
+  commitEffects();
+
   wipRoot = null;
 }
 

@@ -70,17 +70,39 @@ const container = document.getElementById("root")!;
 // const ScopedStyle = ({ css }: { css: string }) => <style>{css}</style>;
 
 function App({ name }: { name: string }) {
-  return <h1>Hi {name} okokok</h1>;
+  const [start, setStart] = Didact.useState(false);
+
+  Didact.useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (start) {
+      interval = setInterval(() => {
+        console.log("Interval");
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [start]);
+
+  return (
+    <div className="">
+      <h1>Hi {name} okokok</h1>
+      <button onClick={() => setStart(() => !start)}>Start</button>
+    </div>
+  );
 }
 
 function Counter() {
   const [count, setCount] = Didact.useState(-10);
+  const [secondCount, setSecond] = Didact.useState(10);
 
   return (
     <div>
       {/* Ajuter des espaces */}
       <p> {count} </p>
       <button onClick={() => setCount(() => count + 1)}>Click</button>
+      <p> {secondCount} </p>
+      <button onClick={() => setSecond(() => secondCount + 1)}>Click</button>
     </div>
   );
 }
