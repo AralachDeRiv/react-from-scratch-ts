@@ -177,7 +177,6 @@ export function createDom(fiber: Fiber): HTMLElement | Text {
   return dom;
 }
 
-// Met à jour les propriétés du DOM
 export function updateDom(
   dom: HTMLElement | Text,
   prevProps: Record<string, any>,

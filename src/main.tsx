@@ -187,6 +187,17 @@ function Header() {
   );
 }
 
-const element = <Page />;
+const Container = () => {
+  const [display, setDisplay] = Didact.useState(true);
+
+  return (
+    <div className="">
+      <button onClick={() => setDisplay(() => !display)}>Display</button>
+      {display && <p>Displayed</p>}
+    </div>
+  );
+};
+
+const element = <Container />;
 
 Didact.render(element, container);

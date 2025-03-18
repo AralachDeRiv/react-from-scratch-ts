@@ -17,15 +17,15 @@ import {
 } from "../types/type";
 import { createDom, createFiber, updateDom } from "./utils";
 
-// Variables globales
+// GLOBAL VARIABLES
 let wipRoot: FiberRoot | null = null;
-let nextUnitOfWork: Fiber | null = null;
 let currentRoot: FiberRoot | null = null;
+let nextUnitOfWork: Fiber | null = null;
 let deletions: Fiber[] = [];
 let wipFiber: DidactElementFiber | null = null;
 let hookIndex: number | null = null;
 
-//  Rendu initial
+//  RENDER
 export function render(
   element: DidactElement | TextElement,
   container: HTMLElement
@@ -46,27 +46,7 @@ export function render(
   nextUnitOfWork = wipRoot;
 }
 
-function updateHostComponent(fiber: Fiber) {
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber);
-  }
-
-  if (isDidactElementFiber(fiber)) {
-    const elements = fiber.props.children.flat();
-    reconcileChildren(fiber, elements);
-  }
-}
-
-function updateFunctionComponent(fiber: Fiber) {
-  if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
-    throw Error("Error");
-  wipFiber = fiber;
-  hookIndex = 0;
-
-  const children = [fiber.type(fiber.props)];
-  reconcileChildren(fiber, children);
-}
-
+// HOOKS
 export function useState(initial: any) {
   if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
 
@@ -187,6 +167,17 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
   hookIndex!++;
 }
 
+export function createContext<T>(defaultValue: T): ContextType<T> {
+  const context: ContextType<T> = {
+    _currentValue: defaultValue,
+    Provider: ({ value, children }) => {
+      context._currentValue = value;
+      return <div className="context-provider">{children}</div>;
+    },
+  };
+  return context;
+}
+
 export function useContext<T>(context: ContextType<T>): T {
   if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
 
@@ -215,6 +206,7 @@ export function useContext<T>(context: ContextType<T>): T {
   return hook.state;
 }
 
+// PERFORM UNIT OF WORK
 export function performUnitOfWork(fiber: Fiber) {
   const isFunctionComponent = fiber.type instanceof Function;
 
@@ -237,6 +229,27 @@ export function performUnitOfWork(fiber: Fiber) {
   }
 
   return null;
+}
+
+function updateHostComponent(fiber: Fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+
+  if (isDidactElementFiber(fiber)) {
+    const elements = fiber.props.children.flat();
+    reconcileChildren(fiber, elements);
+  }
+}
+
+function updateFunctionComponent(fiber: Fiber) {
+  if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
+    throw Error("Error");
+  wipFiber = fiber;
+  hookIndex = 0;
+
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
 }
 
 function reconcileChildren(
@@ -295,12 +308,16 @@ function reconcileChildren(
   }
 }
 
+// COMMITS
 function commitDeletion(fiber: Fiber | null, domParent: HTMLElement | Text) {
   if (!fiber) return;
   if (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text) {
-    domParent.removeChild(fiber.dom);
+    try {
+      domParent.removeChild(fiber.dom);
+    } catch (error) {
+      console.error(error);
+    }
   } else {
-    // 🔽 Descend récursivement jusqu'à trouver un élément DOM à supprimer
     let child = fiber.child;
     while (child) {
       commitDeletion(child, domParent);
@@ -375,7 +392,7 @@ function commitWork(fiber: Fiber | null) {
     if (fiber.effectTag == EffectTag.PLACEMENT) {
       domParent.appendChild(fiber.dom);
     } else if (fiber.effectTag == EffectTag.DELETION) {
-      commitDeletion(fiber.child, domParent);
+      commitDeletion(fiber, domParent);
     } else if (fiber.effectTag == EffectTag.UPDATE) {
       const props = fiber?.alternate?.props ?? {};
       updateDom(fiber.dom, props, fiber.props);
@@ -386,6 +403,7 @@ function commitWork(fiber: Fiber | null) {
   commitWork(fiber.sibling);
 }
 
+// WORKLOOP
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false;
   while (nextUnitOfWork && !shouldYield) {
