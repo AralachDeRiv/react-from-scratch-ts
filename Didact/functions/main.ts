@@ -15,7 +15,7 @@ import {
   TextElement,
   TextElementFiber,
 } from "../types/type";
-import { commitDeletion, createDom, createFiber, updateDom } from "./utils";
+import { createDom, createFiber, updateDom } from "./utils";
 
 // Variables globales
 let wipRoot: FiberRoot | null = null;
@@ -292,6 +292,20 @@ function reconcileChildren(
 
     prevSibling = newFiber;
     index++;
+  }
+}
+
+function commitDeletion(fiber: Fiber | null, domParent: HTMLElement | Text) {
+  if (!fiber) return;
+  if (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text) {
+    domParent.removeChild(fiber.dom);
+  } else {
+    // 🔽 Descend récursivement jusqu'à trouver un élément DOM à supprimer
+    let child = fiber.child;
+    while (child) {
+      commitDeletion(child, domParent);
+      child = child.sibling;
+    }
   }
 }
 

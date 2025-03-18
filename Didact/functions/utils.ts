@@ -7,24 +7,15 @@ import {
 } from "Didact/types/type";
 
 // ELEMENT CREATION
-// TODO : Commenter ici + voir s'il ne faudra pas retirer le 3eme argument
-// TODO : Ajouter ici le @scope par défault pour les tag style ?
-
 export function createElement(
   type: keyof HTMLElementTagNameMap | Function,
-  props: Record<string, any> | null,
-  children: (DidactElement | string | number)[] = []
+  props: Record<string, any> | null
 ): DidactElement {
-  // Si les enfants sont dans `props`, on les extrait
-  const { children: propChildren, ...restProps } = props || {}; // Extraire les enfants si ils existent dans `props`
+  const { children: propChildren, ...restProps } = props || {};
 
-  // Les enfants passés explicitement (paramètre `children`) ont la priorité
-  const finalChildren = children.length > 0 ? children : propChildren || [];
-
-  // Dans le cas où le childre est un text element, celui-ci sera rendu comme une chaine de caractère et non une liste
-  const normalizedChildren = Array.isArray(finalChildren)
-    ? finalChildren
-    : [finalChildren];
+  const normalizedChildren = Array.isArray(propChildren)
+    ? propChildren
+    : [propChildren];
 
   const processedChildren = normalizedChildren.map(
     (child: string | number | DidactElement) => {
@@ -198,23 +189,5 @@ export function updateDom(
 
   if (dom instanceof Text && nextProps.nodeValue !== prevProps.nodeValue) {
     dom.nodeValue = nextProps.nodeValue;
-  }
-}
-
-// TODO : Refaire toute l'implémentation des fonctions
-export function commitDeletion(
-  fiber: Fiber | null,
-  domParent: HTMLElement | Text
-) {
-  if (!fiber) return;
-  if (fiber.dom instanceof HTMLElement || fiber.dom instanceof Text) {
-    domParent.removeChild(fiber.dom);
-  } else {
-    // 🔽 Descend récursivement jusqu'à trouver un élément DOM à supprimer
-    let child = fiber.child;
-    while (child) {
-      commitDeletion(child, domParent);
-      child = child.sibling;
-    }
   }
 }
