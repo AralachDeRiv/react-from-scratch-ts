@@ -48,7 +48,10 @@ export function render(
 
 // HOOKS
 export function useState(initial: any) {
-  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+  if (wipFiber == null || typeof hookIndex !== "number")
+    throw Error(
+      "Unexpected error: wipFiber is null or hookIndex is not a number."
+    );
 
   const oldHook =
     wipFiber &&
@@ -56,8 +59,11 @@ export function useState(initial: any) {
     wipFiber.alternate?.hooks?.[hookIndex];
 
   if (oldHook && oldHook.type !== HookType.STATE) {
-    console.error("Problem with this oldHook : ", oldHook);
-    throw Error("Problem with oldHook inside useState");
+    console.error(
+      "Error: The previous hook is not of the expected type. Previous hook: ",
+      oldHook
+    );
+    throw Error("Error in useState: The previous hook is not of type 'STATE'.");
   }
 
   const hook: StateHook = {
@@ -97,7 +103,10 @@ export function useState(initial: any) {
 }
 
 export function useRef(initial: any) {
-  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+  if (wipFiber == null || typeof hookIndex !== "number")
+    throw Error(
+      "Unexpected error: wipFiber is null or hookIndex is not a number."
+    );
 
   const oldHook =
     wipFiber &&
@@ -105,19 +114,18 @@ export function useRef(initial: any) {
     wipFiber.alternate?.hooks?.[hookIndex];
 
   if (oldHook && oldHook.type !== HookType.REF) {
-    console.error("Error on oldHook type in useRef", oldHook);
-    throw Error("Error on oldHook type in useRef");
+    console.error(
+      "Error: Invalid hook type in useRef. Expected HookType.REF, got:",
+      oldHook
+    );
+    throw Error("Error: Invalid hook type in useRef. Expected HookType.REF.");
   }
 
-  console.log(oldHook);
-
-  // Créer le hook de référence
   const hook: RefHook = {
     type: HookType.REF,
-    current: oldHook ? oldHook.current : initial, // Valeur initiale ou ancienne valeur
+    current: oldHook ? oldHook.current : initial,
   };
 
-  // Si ce n'est pas la première fois, on utilise le hook actuel
   if (!wipFiber.hooks) {
     wipFiber.hooks = [];
   }
@@ -129,7 +137,10 @@ export function useRef(initial: any) {
 }
 
 export function useEffect(effect: () => void | (() => void), deps: any[]) {
-  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+  if (wipFiber == null || typeof hookIndex !== "number")
+    throw Error(
+      "Unexpected error: wipFiber is null or hookIndex is not a number."
+    );
 
   const oldHook =
     wipFiber.alternate &&
@@ -137,8 +148,13 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
     wipFiber.alternate.hooks?.[hookIndex];
 
   if (oldHook && oldHook.type !== HookType.EFFECT) {
-    console.error("Problem with this oldHook : ", oldHook);
-    throw Error("Problem with oldHook inside useState");
+    console.error(
+      "Error: Invalid hook type in useEffect. Expected HookType.EFFECT, got:",
+      oldHook
+    );
+    throw Error(
+      "Error: Invalid hook type in useEffect. Expected HookType.EFFECT."
+    );
   }
 
   const hasChanged =
@@ -156,7 +172,7 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
     type: HookType.EFFECT,
     effect,
     deps,
-    cleanup: cleanup,
+    cleanup,
   };
 
   if (!wipFiber.hooks) {
@@ -179,7 +195,10 @@ export function createContext<T>(defaultValue: T): ContextType<T> {
 }
 
 export function useContext<T>(context: ContextType<T>): T {
-  if (wipFiber == null || typeof hookIndex !== "number") throw Error("Error");
+  if (wipFiber == null || typeof hookIndex !== "number")
+    throw Error(
+      "Unexpected error: wipFiber is null or hookIndex is not a number."
+    );
 
   const oldHook =
     wipFiber.alternate &&
@@ -187,13 +206,13 @@ export function useContext<T>(context: ContextType<T>): T {
     wipFiber.alternate.hooks?.[hookIndex];
 
   if (oldHook && oldHook.type !== HookType.CONTEXT) {
-    console.error("Error with oldHook inside useContext");
+    console.error("Error with oldHook inside useContext : ", oldHook);
     throw Error("Error with oldHook inside useContext");
   }
 
   const hook: ContextHook = {
     type: HookType.CONTEXT,
-    state: context._currentValue, // Valeur actuelle du contexte
+    state: context._currentValue,
   };
 
   if (!wipFiber.hooks) {
@@ -244,7 +263,10 @@ function updateHostComponent(fiber: Fiber) {
 
 function updateFunctionComponent(fiber: Fiber) {
   if (!(fiber.type instanceof Function) || !isDidactElementFiber(fiber))
-    throw Error("Error");
+    throw Error(
+      "The fiber type is not a function or the fiber is not a valid Didact element"
+    );
+
   wipFiber = fiber;
   hookIndex = 0;
 
@@ -266,6 +288,7 @@ function reconcileChildren(
   while (index < elements.length || oldFiber != null) {
     let newFiber: Fiber | null = null;
     const element = elements[index];
+
     const sameType = oldFiber && element && element.type == oldFiber.type;
 
     if (sameType && oldFiber) {
@@ -335,13 +358,10 @@ function commitEffects() {
     if (isDidactElementFiber(fiber) && fiber.hooks) {
       fiber.hooks.forEach((hook) => {
         if (hook.type === HookType.EFFECT) {
-          // Exécuter le cleanup si défini
           if (hook.cleanup) {
             hook.cleanup();
           }
-
           const cleanupFn = hook.effect();
-          // Exécuter le nouvel effet et stocker son cleanup
           hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
         }
       });
@@ -375,9 +395,8 @@ function commitRoot() {
 }
 
 function commitWork(fiber: Fiber | null) {
-  if (!fiber) {
-    return;
-  }
+  if (!fiber) return;
+
   let domParentFiber = fiber?.parent ?? null;
 
   while (!domParentFiber?.dom) {
