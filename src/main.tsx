@@ -29,8 +29,6 @@ import * as Didact from "Didact";
 
 // Didact.render(element, document.getElementById("root")!);
 
-const container = document.getElementById("root")!;
-
 // const updateValue = (e: Event) => {
 //   console.log(e);
 //   const inputElement = e.target as HTMLInputElement;
@@ -68,29 +66,6 @@ const container = document.getElementById("root")!;
 
 // TODO: pt utiliser ceci avec @scope par défault?
 // const ScopedStyle = ({ css }: { css: string }) => <style>{css}</style>;
-
-function App({ name }: { name: string }) {
-  const [start, setStart] = Didact.useState(false);
-
-  Didact.useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (start) {
-      interval = setInterval(() => {
-        console.log("Interval");
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [start]);
-
-  return (
-    <div className="">
-      <h1>Hi {name} okokok</h1>
-      <button onClick={() => setStart(() => !start)}>Start</button>
-    </div>
-  );
-}
 
 function Counter() {
   const [count, setCount] = Didact.useState(-10);
@@ -156,48 +131,60 @@ export function MyComponent() {
   );
 }
 
-// Création d'un contexte pour le thème
-const ThemeContext = Didact.createContext("light");
+// // Création d'un contexte pour le thème
+// const ThemeContext = Didact.createContext("light");
 
-// Composant de l'application
-function Page() {
-  const [theme, setTheme] = Didact.useState("light");
+// // Composant de l'application
+// function Page() {
+//   const [theme, setTheme] = Didact.useState("light");
 
+//   return (
+//     <ThemeContext.Provider value={theme}>
+//       <Header />
+//       <button
+//         onClick={() => setTheme(() => (theme === "light" ? "dark" : "light"))}
+//       >
+//         Toggle Theme
+//       </button>
+//     </ThemeContext.Provider>
+//   );
+// }
+
+// function Header() {
+//   const theme = Didact.useContext(ThemeContext); // Consommer le contexte du thème
+
+//   return (
+//     <header style={{ backgroundColor: theme === "light" ? "white" : "black" }}>
+//       <h1 style={{ color: theme === "light" ? "black" : "white" }}>
+//         Current theme: {theme}
+//       </h1>
+//     </header>
+//   );
+// }
+
+// const Container = () => {
+//   const [display, setDisplay] = Didact.useState(true);
+
+//   return (
+//     <div className="">
+//       <button onClick={() => setDisplay(() => !display)}>Display</button>
+//       {display && <p>Displayed</p>}
+//     </div>
+//   );
+// };
+
+import { Header } from "./mainComponents/header";
+
+const App = () => {
   return (
-    <ThemeContext.Provider value={theme}>
+    <div>
       <Header />
-      <button
-        onClick={() => setTheme(() => (theme === "light" ? "dark" : "light"))}
-      >
-        Toggle Theme
-      </button>
-    </ThemeContext.Provider>
-  );
-}
-
-function Header() {
-  const theme = Didact.useContext(ThemeContext); // Consommer le contexte du thème
-
-  return (
-    <header style={{ backgroundColor: theme === "light" ? "white" : "black" }}>
-      <h1 style={{ color: theme === "light" ? "black" : "white" }}>
-        Current theme: {theme}
-      </h1>
-    </header>
-  );
-}
-
-const Container = () => {
-  const [display, setDisplay] = Didact.useState(true);
-
-  return (
-    <div className="">
-      <button onClick={() => setDisplay(() => !display)}>Display</button>
-      {display && <p>Displayed</p>}
+      {/* <Posts /> */}
     </div>
   );
 };
 
-const element = <Container />;
+const app = <App />;
 
-Didact.render(element, container);
+const container = document.getElementById("root")!;
+Didact.render(app, container);

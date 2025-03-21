@@ -226,7 +226,7 @@ export function useContext<T>(context: ContextType<T>): T {
 }
 
 // PERFORM UNIT OF WORK
-export function performUnitOfWork(fiber: Fiber) {
+function performUnitOfWork(fiber: Fiber) {
   const isFunctionComponent = fiber.type instanceof Function;
 
   if (isFunctionComponent) {
