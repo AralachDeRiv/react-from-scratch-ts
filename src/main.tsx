@@ -179,7 +179,7 @@ const App = () => {
   return (
     <div>
       <Header />
-      {/* <Posts /> */}
+      <Posts />
     </div>
   );
 };

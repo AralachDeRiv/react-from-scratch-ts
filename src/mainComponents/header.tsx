@@ -1,4 +1,6 @@
 export const Header = () => {
+  const backgroundColor = "rgba(10, 181, 175, 0.175)";
+
   return (
     <header>
       <div class="logo-container">
@@ -16,15 +18,14 @@ export const Header = () => {
             position: fixed;
             top: 0;
             left: 0;
-
             width: 100%;
             height: 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem 1rem;
-            background-color: rgba(10, 181, 175, 0.175);
-            backdrop-filter: blur(1px);
+            background-color: ${backgroundColor};
+            backdrop-filter: invert(1) blur(1px);
 
             & .logo-container{
                 font-family: "Luckiest Guy", cursive;
