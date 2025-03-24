@@ -1,5 +1,5 @@
 export const Header = () => {
-  const backgroundColor = "rgba(10, 181, 175, 0.175)";
+  const backgroundColor = "rgba(10, 181, 175, 0.47)";
 
   return (
     <header>

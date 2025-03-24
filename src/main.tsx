@@ -98,7 +98,7 @@ function Posts() {
         {`
     
           .post p {
-          color: ${blue}         
+              
           }    
      
         `}
@@ -162,13 +162,19 @@ export function MyComponent() {
 //   );
 // }
 
-// const Container = () => {
-//   const [display, setDisplay] = Didact.useState(true);
-
+// const Container = ({ children }: { children: DidactElementFiber }) => {
 //   return (
-//     <div className="">
-//       <button onClick={() => setDisplay(() => !display)}>Display</button>
-//       {display && <p>Displayed</p>}
+//     <div className="container">
+//       {children}
+
+//       <style>
+//         {`
+//       .container p {
+//         color: red;
+//       }
+
+//       `}
+//       </style>
 //     </div>
 //   );
 // };
@@ -179,7 +185,6 @@ const App = () => {
   return (
     <div>
       <Header />
-      <Posts />
     </div>
   );
 };
