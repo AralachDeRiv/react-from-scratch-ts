@@ -93,16 +93,6 @@ function Posts() {
           <p>{post}</p>
         </div>
       ))}
-
-      <style>
-        {`
-    
-          .post p {
-              
-          }    
-     
-        `}
-      </style>
     </div>
   );
 }
@@ -179,12 +169,21 @@ export function MyComponent() {
 //   );
 // };
 
+const Test = () => {
+  return <p>I'm a test !!</p>;
+};
+
 import { Header } from "./mainComponents/header";
+import { ContainerWrapper } from "./components/containerWrapper";
+import { ContainerStyle } from "./types/types";
 
 const App = () => {
   return (
     <div>
       <Header />
+      <ContainerWrapper style={ContainerStyle.DARK} isFirst={true}>
+        <Test></Test>
+      </ContainerWrapper>
     </div>
   );
 };

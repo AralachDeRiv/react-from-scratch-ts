@@ -25,16 +25,12 @@ export const Header = () => {
             align-items: center;
             padding: 1.5rem 1rem;
             background-color: ${backgroundColor};
-            backdrop-filter: invert(1) blur(1px);
+            backdrop-filter:  blur(1px);
 
             & .logo-container{
                 font-family: "Luckiest Guy", cursive;
                 font-weight: 400;
-                color: green; 
-            }
-                
-            
-
+            }                      
         }
 
         `}
