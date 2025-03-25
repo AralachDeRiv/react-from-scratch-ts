@@ -5,9 +5,15 @@
   --white: #f8f9fa;
   --black: #121212;
   --main-font-family: "Montserrat", sans-serif;
+  --text-light-primary: #212529;
+  --text-light-secondary: #495057;
+  --text-dark-primary: #f8f9fa;
+  --text-dark-secondary: #adb5bd;
+  --font-size-base: clamp(0.8rem, 1vw + 0.3rem, 1rem);
 }
 
 body {
   background-color: var(--white);
   font-family: var(--main-font-family);
+  font-size: var(--font-size-base);
 }

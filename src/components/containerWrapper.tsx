@@ -12,7 +12,6 @@ export const ContainerWrapper = ({
 }) => {
   const backgroundColor =
     style == ContainerStyle.LIGHT ? "var(--white)" : "var(--black)";
-  const color = style == ContainerStyle.LIGHT ? "var(--black)" : "var(--white)";
 
   return (
     <section
@@ -28,13 +27,19 @@ export const ContainerWrapper = ({
                 :scope{
                     /* To let some space for the header */
                     ${isFirst && "margin-top: 50px"};
-                    height: 200px;
 
-                    
+                
+                    min-height: 200px;
+                    overflow: hidden;
+                    padding: 20px 30px;
+                    margin-inline: 2px;
+                    border-radius: 20px;
                     background-color: ${backgroundColor};
-                    & p {
-                        color: ${color}    
-                    }
+
+                    display: flex;
+                    & > div{
+                      flex-grow: 1;
+                  }
                 }
             }                   
         `}

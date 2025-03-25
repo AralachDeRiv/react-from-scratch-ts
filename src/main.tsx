@@ -175,6 +175,7 @@ const Test = () => {
 
 import { Header } from "./mainComponents/header";
 import { ContainerWrapper } from "./components/containerWrapper";
+import { Introduction } from "./mainComponents/introduction";
 import { ContainerStyle } from "./types/types";
 
 const App = () => {
@@ -182,7 +183,7 @@ const App = () => {
     <div>
       <Header />
       <ContainerWrapper style={ContainerStyle.LIGHT} isFirst={true}>
-        <Test></Test>
+        <Introduction />
       </ContainerWrapper>
       <ContainerWrapper style={ContainerStyle.DARK}>
         <Test></Test>

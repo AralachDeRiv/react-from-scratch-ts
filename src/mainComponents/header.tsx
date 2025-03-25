@@ -105,7 +105,6 @@ export const Header = () => {
             padding: 1.5rem 1rem;
             background-color: transparent;
             backdrop-filter: blur(2px);
-
             border-bottom: 1px solid rgba(130, 122, 122, 0.24);
 
             & .logo-container{
