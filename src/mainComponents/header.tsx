@@ -135,42 +135,41 @@ export const Header = () => {
               background-color: var(--white);
               border: 1px solid var(--white);
               border-radius: 50%;
-              
-
 
               & a{
                 position: absolute;
                 overflow: hidden;
-                top: 0;
+                opacity: 0;
+                top: 50%;
                 left: 0;
-                transform: translate(-110%, -3px);
-
+                transform: translate(-110%, -50%);
 
                 color: var(--black);
                 white-space: nowrap;
                 text-decoration: none;
-
-
                 font-size: 13px;
-                padding: 3px 10px;
+                font-weight: 600;
+
                 background-color: var(--white);
+                padding: 9px 20px;
                 border: 1px solid var(--black);
-                border-radius: 6px;
-                opacity: 0;
-                transition: opacity 0.6s ease;
+                border-radius: 50px;
 
-     
+                transition: box-shadow 0.4s, background-color 0.4s, color 0.4s, opacity 0.7s ;
+
+                &:hover{
+                  box-shadow: inset 0 0 0 3px #ef476f, 
+                                  inset 0 0 0 6px #ffd166, 
+                                  inset 0 0 0 9px #06d6a0,
+                                  inset 0 0 0 12px #118ab2;
+                  background-color: #073b4c;
+                  color: var(--white);
+                }     
               }
-
 
               &:hover a{
                 opacity: 1;
-            
               }
-
-
-
-
          
             }          
         }
