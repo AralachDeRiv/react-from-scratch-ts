@@ -10,31 +10,35 @@ export const ContainerWrapper = ({
   children: DidactElementFiber;
   isFirst?: boolean;
 }) => {
-  const backgroundColor = style == ContainerStyle.LIGHT ? "white" : "black";
-  const color = style == ContainerStyle.LIGHT ? "black" : "white";
+  const backgroundColor =
+    style == ContainerStyle.LIGHT ? "var(--white)" : "var(--black)";
+  const color = style == ContainerStyle.LIGHT ? "var(--black)" : "var(--white)";
 
   return (
-    <div className="container-wrapper">
+    <section
+      className={`container-wrapper ${
+        style == ContainerStyle.LIGHT ? "white-bg" : "black-bg"
+      }`}
+    >
       {children}
 
       <style>
         {`
             @scope{
                 :scope{
-                    ${isFirst && "margin-top: 200px"};
+                    /* To let some space for the header */
+                    ${isFirst && "margin-top: 50px"};
+                    height: 200px;
+
+                    
                     background-color: ${backgroundColor};
                     & p {
                         color: ${color}    
                     }
-                    
-             
-                  
-
-                    
                 }
             }                   
         `}
       </style>
-    </div>
+    </section>
   );
 };

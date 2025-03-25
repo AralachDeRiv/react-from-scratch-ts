@@ -181,7 +181,28 @@ const App = () => {
   return (
     <div>
       <Header />
-      <ContainerWrapper style={ContainerStyle.DARK} isFirst={true}>
+      <ContainerWrapper style={ContainerStyle.LIGHT} isFirst={true}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.DARK}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.LIGHT}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.DARK}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.LIGHT}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.DARK}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.LIGHT}>
+        <Test></Test>
+      </ContainerWrapper>
+      <ContainerWrapper style={ContainerStyle.DARK}>
         <Test></Test>
       </ContainerWrapper>
     </div>
