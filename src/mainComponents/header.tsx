@@ -2,6 +2,8 @@ import * as Didact from "Didact";
 
 export const Header = () => {
   Didact.useEffect(() => {
+    const logoContainer =
+      document.querySelector<HTMLElement>(".logo-container");
     const logoText = document.querySelector<HTMLElement>(".logo-container h2");
     const header = document.querySelector<HTMLElement>("header");
 
@@ -9,7 +11,11 @@ export const Header = () => {
       document.querySelectorAll<HTMLElement>(".black-bg, .white-bg")
     );
 
-    if (!logoText || !header || sections.length === 0) return;
+    if (!logoText || !header || !logoContainer || sections.length === 0) return;
+
+    // These variables will be used to active the animation
+    let previousColorClass = "";
+    let currentColorClass = "";
 
     const updateLogoColor = () => {
       let closestSection: HTMLElement | null = null;
@@ -33,11 +39,20 @@ export const Header = () => {
 
       if (closestSection instanceof HTMLElement) {
         if (closestSection.classList.contains("black-bg")) {
+          currentColorClass = "black-logo";
           logoText.classList.remove("black-logo");
           logoText.classList.add("white-logo");
         } else {
+          currentColorClass = "white-logo";
           logoText.classList.remove("white-logo");
           logoText.classList.add("black-logo");
+        }
+
+        if (currentColorClass !== previousColorClass) {
+          logoContainer.classList.remove("animate-logo-container");
+          void logoContainer.offsetWidth;
+          logoContainer.classList.add("animate-logo-container");
+          previousColorClass = currentColorClass;
         }
       }
     };
@@ -63,6 +78,18 @@ export const Header = () => {
       <style>
         {`
 
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(calc(1 + var(--scaleAmplitude)));
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
         header{
             position: fixed;
             top: 0;
@@ -74,14 +101,21 @@ export const Header = () => {
             align-items: center;
             padding: 1.5rem 1rem;
             background-color: transparent;
-            backdrop-filter:  blur(1px);
+            backdrop-filter: blur(1px);
+
+            border-bottom: 1px solid #827a7a;
 
             & .logo-container{
+                --scaleAmplitude: 0.2;
+
+                &.animate-logo-container{
+                    animation: pulse 0.5s ease-in-out;
+                  }
 
                 & h2{  
                     font-family: "Luckiest Guy", cursive;
                     font-weight: 400;      
-                    transition: color 1s linear;
+                    transition: color 0.3s linear;
 
                     &.black-logo{
                       color: var(--black);
@@ -89,9 +123,15 @@ export const Header = () => {
                     
                     &.white-logo{
                       color: var(--white);
-                    }                   
+                    }
                 } 
-            }       
+            }
+
+            & .link-container{
+              background-color: var(--white);
+              border-radius: 50%;
+              cursor: pointer;
+            }          
         }
 
         `}
