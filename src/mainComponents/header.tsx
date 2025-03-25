@@ -101,7 +101,7 @@ export const Header = () => {
             align-items: center;
             padding: 1.5rem 1rem;
             background-color: transparent;
-            backdrop-filter: blur(1px);
+            backdrop-filter: blur(2px);
 
             border-bottom: 1px solid #827a7a;
 
@@ -129,8 +129,10 @@ export const Header = () => {
 
             & .link-container{
               background-color: var(--white);
+              border: 1px solid var(--white);
               border-radius: 50%;
               cursor: pointer;
+         
             }          
         }
 
