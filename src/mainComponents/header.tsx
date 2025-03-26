@@ -1,6 +1,9 @@
 import * as Didact from "Didact";
 
 export const Header = () => {
+  let previousColorClass = Didact.useRef("");
+  let currentColorClass = Didact.useRef("");
+
   Didact.useEffect(() => {
     const logoContainer =
       document.querySelector<HTMLElement>(".logo-container");
@@ -14,8 +17,8 @@ export const Header = () => {
     if (!logoText || !header || !logoContainer || sections.length === 0) return;
 
     // These variables will be used to active the animation
-    let previousColorClass = "";
-    let currentColorClass = "";
+    // let previousColorClass = "";
+    // let currentColorClass = "";
 
     const updateLogoColorAndAnimation = () => {
       let closestSection: HTMLElement | null = null;
@@ -39,20 +42,20 @@ export const Header = () => {
 
       if (closestSection instanceof HTMLElement) {
         if (closestSection.classList.contains("black-bg")) {
-          currentColorClass = "black-logo";
+          currentColorClass.current = "black-logo";
           logoText.classList.remove("black-logo");
           logoText.classList.add("white-logo");
         } else {
-          currentColorClass = "white-logo";
+          currentColorClass.current = "white-logo";
           logoText.classList.remove("white-logo");
           logoText.classList.add("black-logo");
         }
 
-        if (currentColorClass !== previousColorClass) {
+        if (currentColorClass.current !== previousColorClass.current) {
           logoContainer.classList.remove("animate-logo-container");
           void logoContainer.offsetWidth;
           logoContainer.classList.add("animate-logo-container");
-          previousColorClass = currentColorClass;
+          previousColorClass.current = currentColorClass.current;
         }
       }
     };
