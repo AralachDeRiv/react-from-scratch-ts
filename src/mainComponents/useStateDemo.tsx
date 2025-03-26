@@ -80,7 +80,6 @@ export const UseStateDemo = () => {
                     }
     
                     & .frame-container{
-                        align-self: start;
     
                         & .frame{
                             width: 300px;
@@ -91,12 +90,11 @@ export const UseStateDemo = () => {
     
                             background-image: linear-gradient(45deg,rgb(201, 30, 70),rgb(21, 82, 226));
                             background-clip: text;
+                            animation: hueRotation 4s linear infinite;
 
                             display: flex;
                             justify-content: center;
                             align-items: center;
-
-                            animation: hueRotation 4s linear infinite;
     
                             & h2{
                                 --text-length: ${text.length};
