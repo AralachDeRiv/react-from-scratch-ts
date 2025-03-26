@@ -176,9 +176,10 @@ const Test = () => {
 import { Header } from "./mainComponents/header";
 import { ContainerWrapper } from "./components/containerWrapper";
 import { Introduction } from "./mainComponents/introduction";
-import { ReconciliationDemo } from "./mainComponents/reconciliationDemo";
+
 import { UseRefDemo } from "./mainComponents/useRefDemo";
 import { ContainerStyle } from "./types/types";
+import { UseStateDemo } from "./mainComponents/useStateDemo";
 
 const App = () => {
   return (
@@ -188,7 +189,7 @@ const App = () => {
         <Introduction />
       </ContainerWrapper>
       <ContainerWrapper style={ContainerStyle.DARK}>
-        <ReconciliationDemo />
+        <UseStateDemo />
       </ContainerWrapper>
       <ContainerWrapper style={ContainerStyle.LIGHT}>
         <UseRefDemo />

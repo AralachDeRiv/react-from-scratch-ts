@@ -9,8 +9,8 @@ export const Introduction = () => {
         </a>
         . Didact implements a custom-rendered version of React, showcasing how
         the Virtual DOM, reconciliation, and fiber architecture work under the
-        hood. Further down, you'll find a demo covering reconciliation, useRef,
-        useContext, useState, and useEffect.
+        hood. Further down, you'll find a demo covering useRef, useContext,
+        useState, and useEffect.
       </p>
 
       <style>

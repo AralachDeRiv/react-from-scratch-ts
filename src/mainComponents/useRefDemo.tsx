@@ -8,10 +8,10 @@ export const UseRefDemo = () => {
 
       <style>
         {`
-                @scope{
-                    position: relative;
-                }
-            `}
+            @scope{
+                position: relative;
+            }
+        `}
       </style>
     </div>
   );
