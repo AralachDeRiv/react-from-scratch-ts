@@ -1,10 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 
 :root {
   --white: #f8f9fa;
   --black: #121212;
   --main-font-family: "Montserrat", sans-serif;
+  --title-font-family: "Playfair Display", serif;
   --text-light-primary: #212529;
   --text-light-secondary: #495057;
   --text-dark-primary: #f8f9fa;
