@@ -2,6 +2,7 @@ import * as Didact from "Didact";
 import { ContainerStyle } from "../types/types";
 import { DemoTitle } from "../components/demoTitle";
 
+// TODO: maybe change grandient/animation
 export const UseStateDemo = () => {
   const [text, setText] = Didact.useState("");
 
@@ -31,7 +32,18 @@ export const UseStateDemo = () => {
 
       <style>
         {`
+
+                @keyframes hueRotation{
+                    from{
+                        filter: hue-rotate(0)
+                    }
+                    to{
+                        filter: hue-rotate(360deg) 
+                    } 
+                }
+
                 @scope{
+
                     position: relative;
                     padding: 25px;
                     display: flex;
@@ -77,20 +89,22 @@ export const UseStateDemo = () => {
                             outline: 10px groove var(--white);
                             border: 10px groove var(--white);
     
-                            background-image: linear-gradient(45deg, blue, red);
+                            background-image: linear-gradient(45deg,rgb(201, 30, 70),rgb(21, 82, 226));
                             background-clip: text;
 
                             display: flex;
                             justify-content: center;
                             align-items: center;
+
+                            animation: hueRotation 4s linear infinite;
     
                             & h2{
-                                --text-length: ${text.length * 0.7};
+                                --text-length: ${text.length};
                                 text-align: center;
                                 color: transparent;
                                 line-height: 1;
-                                font-size: clamp(40px, calc(500px / var(--text-length)), 150px);
-                             
+                                font-size: clamp(40px, calc(300px / var(--text-length)), 200px);
+                                font-weight: 900;
                                 overflow-wrap: break-word; 
                                 word-break: break-word;
                             }
