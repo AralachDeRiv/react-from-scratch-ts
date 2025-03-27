@@ -388,8 +388,8 @@ function commitRoot() {
   commitWork(wipRoot?.child ?? null);
   currentRoot = wipRoot;
 
-  commitEffects();
   commitRefs(currentRoot?.child ?? null);
+  commitEffects();
 
   wipRoot = null;
 }

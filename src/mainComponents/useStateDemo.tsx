@@ -43,7 +43,6 @@ export const UseStateDemo = () => {
                 }
 
                 @scope{
-
                     position: relative;
                     padding: 25px;
                     display: flex;
@@ -52,14 +51,11 @@ export const UseStateDemo = () => {
                     justify-content: space-evenly;
                     align-items: end;
                   
-    
                     & .input-container{
                         min-width: 320px;
-    
                         display: flex;
                         justify-content: center;
     
-                        
                         & input{
                             font-weight: 600;
                             outline: 4px solid var(--white);

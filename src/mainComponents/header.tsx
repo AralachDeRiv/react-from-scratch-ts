@@ -1,6 +1,7 @@
 import * as Didact from "Didact";
 
 export const Header = () => {
+  // These variables will be used to active the animation
   let previousColorClass = Didact.useRef("");
   let currentColorClass = Didact.useRef("");
 
@@ -15,10 +16,6 @@ export const Header = () => {
     );
 
     if (!logoText || !header || !logoContainer || sections.length === 0) return;
-
-    // These variables will be used to active the animation
-    // let previousColorClass = "";
-    // let currentColorClass = "";
 
     const updateLogoColorAndAnimation = () => {
       let closestSection: HTMLElement | null = null;
