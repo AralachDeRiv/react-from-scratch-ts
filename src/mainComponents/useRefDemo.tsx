@@ -182,7 +182,6 @@ export const UseRefDemo = () => {
                       &.box-1{
                         transition:transform 0.5s ease-in-out, background-color 1s ease-in;
           
-              
                         &.animating {
                           pointer-events: none; 
                         }
