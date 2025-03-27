@@ -2,6 +2,7 @@ import * as Didact from "Didact";
 import { ContainerStyle } from "../types/types";
 import { DemoTitle } from "../components/demoTitle";
 
+// TODO: modifier l'animation de message
 export const UseRefDemo = () => {
   let box1Ref = Didact.useRef(null);
   let box2Ref = Didact.useRef(null);
@@ -14,6 +15,16 @@ export const UseRefDemo = () => {
       return `#${randomColor.padStart(6, "0")}`;
     };
 
+    const handleMessageAnimation = (newMessage: string) => {
+      messageRef.current.classList.add("fade-out");
+      messageRef.current.classList.remove("fade-in");
+      setTimeout(() => {
+        setMessage(() => newMessage);
+        messageRef.current.classList.remove("fade-out");
+        messageRef.current.classList.add("fade-in");
+      }, 500);
+    };
+
     const handleClick1 = () => {
       box1Ref.current.classList.add("animating");
       box1Ref.current.style.animation = "none";
@@ -24,32 +35,20 @@ export const UseRefDemo = () => {
       box1Ref.current.style.backgroundColor = newColor;
       messageRef.current.style.color = newColor;
 
-      messageRef.current.classList.add("fade-out");
-      messageRef.current.classList.remove("fade-in");
-      setTimeout(() => {
-        setMessage(() => "Box 1 clicked!");
-        messageRef.current.classList.remove("fade-out");
-        messageRef.current.classList.add("fade-in");
-      }, 500);
+      handleMessageAnimation("Box 1 clicked!");
     };
 
     const handleClick2 = () => {
       box2Ref.current.classList.add("animating");
       box2Ref.current.style.animation = "none";
-      box2Ref.current.offsetHeight; /* Force reflow */
+      box2Ref.current.offsetHeight;
       box2Ref.current.style.animation = "wiggle 75ms linear 9";
 
       const newColor = getRandomHexColor();
       box2Ref.current.style.backgroundColor = newColor;
       messageRef.current.style.color = newColor;
 
-      messageRef.current.classList.add("fade-out");
-      messageRef.current.classList.remove("fade-in");
-      setTimeout(() => {
-        setMessage(() => "Box 2 clicked!");
-        messageRef.current.classList.remove("fade-out");
-        messageRef.current.classList.add("fade-in");
-      }, 500);
+      handleMessageAnimation("Box 2 clicked!");
     };
 
     const handleAnimationEndBox1 = () => {
@@ -181,12 +180,9 @@ export const UseRefDemo = () => {
                       
 
                       &.box-1{
-                        transition:transform 0.5s ease-in-out, background-color 0.4s ease-in;
+                        transition:transform 0.5s ease-in-out, background-color 1s ease-in;
           
-                        .jello {
-                          animation: jello 1.5s ease-in;
-                        }
-
+              
                         &.animating {
                           pointer-events: none; 
                         }
@@ -197,7 +193,7 @@ export const UseRefDemo = () => {
                       }
 
                       &.box-2{
-                        transition: background-color 0.4s ease-in, transform 0.5s ease 0.1s;
+                        transition: background-color 1s ease-in, transform 0.5s ease 0.1s;
 
                         &.animating {
                           pointer-events: none; 
