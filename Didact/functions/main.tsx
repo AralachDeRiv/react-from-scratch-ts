@@ -157,16 +157,22 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
     );
   }
 
-  const hasChanged =
-    !oldHook || !deps || deps.some((dep, i) => dep !== oldHook.deps![i]);
+  // TODO: see if the debug here doesn't affect other part
+
+  // const hasChanged =
+  //   !oldHook || !deps || deps.some((dep, i) => dep !== oldHook.deps![i]);
 
   let cleanup: (() => void) | null | undefined;
 
-  if (hasChanged && oldHook && oldHook.cleanup) {
-    cleanup = oldHook.cleanup;
-  } else {
-    cleanup = null;
+  if (oldHook && oldHook.cleanup) {
+    oldHook.cleanup();
   }
+
+  // if (hasChanged && oldHook && oldHook.cleanup) {
+  //   cleanup = oldHook.cleanup;
+  // } else {
+  //   cleanup = null;
+  // }
 
   const hook: EffectHook = {
     type: HookType.EFFECT,
@@ -349,6 +355,7 @@ function commitDeletion(fiber: Fiber | null, domParent: HTMLElement | Text) {
   }
 }
 
+let effectQueue: EffectHook[] = [];
 function commitEffects() {
   if (!currentRoot) return;
 
@@ -358,11 +365,12 @@ function commitEffects() {
     if (isDidactElementFiber(fiber) && fiber.hooks) {
       fiber.hooks.forEach((hook) => {
         if (hook.type === HookType.EFFECT) {
-          if (hook.cleanup) {
-            hook.cleanup();
-          }
-          const cleanupFn = hook.effect();
-          hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
+          // if (hook.cleanup) {
+          //   hook.cleanup();
+          // }
+          effectQueue.push(hook);
+          // const cleanupFn = hook.effect();
+          // hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
         }
       });
     }
@@ -372,6 +380,13 @@ function commitEffects() {
   }
 
   runEffects(currentRoot.child);
+
+  effectQueue.forEach((hook) => {
+    const cleanupFn = hook.effect();
+    hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
+  });
+
+  effectQueue = [];
 }
 
 function commitRefs(fiber: Fiber | null) {
