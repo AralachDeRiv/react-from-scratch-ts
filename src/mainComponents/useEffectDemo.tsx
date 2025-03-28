@@ -4,7 +4,7 @@ import { DemoTitle } from "../components/demoTitle";
 export const UseEffectDemo = () => {
   return (
     <div>
-      <DemoTitle title="USEREF" style={ContainerStyle.LIGHT} />
+      <DemoTitle title="USEEFFECT" style={ContainerStyle.LIGHT} />
 
       <style>
         {`

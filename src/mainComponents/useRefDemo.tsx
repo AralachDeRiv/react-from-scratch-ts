@@ -167,6 +167,7 @@ export const UseRefDemo = () => {
                 }
 
                 & .container-boxes{
+                  margin-bottom: 30px;
                   display: flex;
                   justify-content: space-evenly;
 

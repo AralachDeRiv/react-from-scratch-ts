@@ -27,6 +27,11 @@ const Lights = () => {
       <div class={`light light-four  ${light}`}></div>
       <div class={`light light-five  ${light}`}></div>
 
+      <h2>
+        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus,
+        delectus!
+      </h2>
+
       <style>
         {`
             @scope{
@@ -34,6 +39,15 @@ const Lights = () => {
                     position: relative;
                     width: 100%;
                     height: 100%;
+
+                    h2{
+                      color: var(--black);
+                      position :absolute;
+                      top: 50%;
+                      z-index: 10;
+                  
+                    
+                    }
 
                     .light{
                         position: absolute;
@@ -96,15 +110,13 @@ export const UseContextDemo = () => {
       <DemoTitle title="USECONTEXT" style={ContainerStyle.DARK} />
       <LightContext.Provider value={light}>
         <Lights />
-        <div class="switch">
+
+        <div class="toggle">
           <input
-            id="toggle"
             type="checkbox"
             onChange={() => setLight(() => (light == "ON" ? "OFF" : "ON"))}
           />
-          <label class="toggle" for="toggle">
-            <i></i>
-          </label>
+          <label></label>
         </div>
       </LightContext.Provider>
 
@@ -120,104 +132,63 @@ export const UseContextDemo = () => {
                         height: 100%;    
                     }
 
-                    .switch {
-                        position: absolute;
-                        bottom: 10px;
-                        right: 40px;
-                        width: 210px;
-                        height: 50px;
-                        box-sizing: border-box;
-                        padding: 3px;
-                        background: #0d0d0d;
-                        border-radius: 6px;
-                        box-shadow: inset 0 1px 1px 1px rgba(0, 0, 0, 0.5),
-                          0 1px 0 0 rgba(255, 255, 255, 0.1);
 
-                        & input[type="checkbox"] {
-                          position: absolute;
-                          z-index: 1;
-                          width: 100%;
-                          height: 100%;
-                          opacity: 0;
-                          cursor: pointer;
-
-                          & + label {
-                            position: relative;
-                            display: block;
-                            left: 0;
-                            width: 50%;
-                            height: 100%;
-                            background: #1b1c1c;
-                            border-radius: 3px;
-                            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-                            transition: all 0.5s ease-in-out;
-                          }
-
-                          & + label:before {
-                            content: "";
-                            display: inline-block;
-                            width: 5px;
-                            height: 5px;
-                            margin-left: 10px;
-                            background: #fff;
-                            border-radius: 50%;
-                            vertical-align: middle;
-                            box-shadow: 0 0 5px 2px rgba(165, 15, 15, 0.9),
-                              0 0 3px 1px rgba(165, 15, 15, 0.9);
-                            transition: all 0.5s ease-in-out;
-                          }
-
-                          & + label:after {
-                            content: "";
-                            display: inline-block;
-                            width: 0;
-                            height: 100%;
-                            vertical-align: middle;
-                          }
-
-                          & + label i {
-                            display: block;
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            width: 3px;
-                            height: 24px;
-                            margin-top: -12px;
-                            margin-left: -1.5px;
-                            border-radius: 2px;
-                            background: #0d0d0d;
-                            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.3);
-                          }
-
-                          & label i:before,
-                          & + label i:after {
-                            content: "";
-                            display: block;
-                            position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 2px;
-                            background: #0d0d0d;
-                            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.3);
-                          }
-
-                          & + label i:before {
-                            left: -7px;
-                          }
-
-                          & + label i:after {
-                            left: 7px;
-                          }
-
-                          &:checked + label {
-                            left: 50%;
-                          }
-
-                          &:checked + label:before {
-                            box-shadow: 0 0 5px 2px rgba(15, 165, 70, 0.9),
-                              0 0 3px 1px rgba(15, 165, 70, 0.9);
-                          }
-                    }                            
+                  .toggle {
+                    position: absolute;
+                    bottom: 20px;
+                    right: 30px;
+                  
+                    
+                    & input[type="checkbox"] {
+                      position: absolute;
+                      left: 0;
+                      top: 0;
+                      z-index: 10;
+                      width: 100%;
+                      height: 100%;
+                      cursor: pointer;
+                      opacity: 0;
+                    }
+                    
+                    & label {
+                      position: relative;
+                      display: flex;
+                    }
+                    
+                    & label:before {
+                      content: "";
+                      width: 28px;
+                      height: 60px;
+                      background: linear-gradient(#bbb, #bbb) no-repeat center;
+                      background-size: 2px 64px;
+                      display: inline-block;
+                      transition: 0.2s ease-in;
+                    }
+                    
+                    & label:after {
+                      content: "";
+                      position: absolute;
+                      width: 28px;
+                      height: 28px;
+                      border: 6px solid #bbb;
+                      border-radius: 50%;
+                      left: 0;
+                      top: 0;
+                      z-index: 2;
+                      background: #fff;
+                      transition: 0.2s ease-in;
+                    }
+                    
+                    & input[type="checkbox"]:checked + label:before {
+                      background-image: linear-gradient(#77c2bb, #77c2bb);
+                    }
+                    
+                    & input[type="checkbox"]:checked + label:after {
+                      top: 32px;
+                      border-color: #009688;
+                    }
+                  }
+   
                 }
             }  
         `}
