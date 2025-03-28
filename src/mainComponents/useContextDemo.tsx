@@ -49,7 +49,7 @@ const Lights = () => {
                         clip-path: polygon(50% 0%, 10% 100%, 90% 100%);
 
                         opacity: 0; 
-                        transition: opacity 0.3s ease-in-out;
+                        transition: opacity 0.3s ease;
 
                         --light-color : ;
                         background: linear-gradient(
@@ -76,19 +76,19 @@ const Lights = () => {
                         &.light-two{
                             --light-color: #ffd166;
                             left: 45%; 
-                            transition-delay: 0.75s;                       
+                            transition-delay: 0.7s;                       
                         }
 
                         &.light-three{
                             --light-color: #06d6a0;
                             left: 65%; 
-                            transition-delay: 1s;                        
+                            transition-delay: 0.9s;                        
                         }
 
                         &.light-four{
                             --light-color: #118ab2;
                             left: 85%;
-                            transition-delay: 1.25s; 
+                            transition-delay: 1.1s; 
                         }
 
                         & .shape{
@@ -149,12 +149,15 @@ export const UseContextDemo = () => {
       <LightContext.Provider value={light}>
         <Lights />
 
-        <div class="toggle">
-          <input
-            type="checkbox"
-            onChange={() => setLight(() => (light == "ON" ? "OFF" : "ON"))}
-          />
-          <label></label>
+        <div class="toggle-container">
+          <h3>Toggle the switch</h3>
+          <div class="toggle">
+            <input
+              type="checkbox"
+              onChange={() => setLight(() => (light == "ON" ? "OFF" : "ON"))}
+            />
+            <label></label>
+          </div>
         </div>
       </LightContext.Provider>
 
@@ -170,13 +173,31 @@ export const UseContextDemo = () => {
                         height: 100%;    
                     }
 
+                  
+                  .toggle-container{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    
+                    display: flex;
+                    gap: 20px;
+                    align-items: center;
+
+
+                    & h3{
+                      color: var(--white);
+                      font-family: var(--hand-write-font-family);
+                      font-size: 1.4rem;
+                      font-weight: 200;
+                    
+                    }
+                  
+                  }
+
 
                   .toggle {
-                    position: absolute;
-                    bottom: 20px;
-                    right: 30px;
-                  
-                    
+                    position: relative;
+  
                     & input[type="checkbox"] {
                       position: absolute;
                       left: 0;
