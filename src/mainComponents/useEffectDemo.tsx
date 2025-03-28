@@ -16,7 +16,7 @@ export const UseEffectDemo = () => {
           if (seconds % 60 == 59) setMinutes(() => minutes + 1);
           return seconds + 1;
         });
-      }, 150);
+      }, 500);
     }
 
     return () => clearInterval(interval);
@@ -27,13 +27,31 @@ export const UseEffectDemo = () => {
       <DemoTitle title="USEEFFECT" style={ContainerStyle.LIGHT} />
 
       <div class="clock-container">
-        <button onClick={() => setStart(() => (start == true ? false : true))}>
-          start
-        </button>
+        <div className="buttons-container">
+          <div
+            class={`playPauseButton ${start ? "pause" : ""}`}
+            onClick={() => setStart(() => !start)}
+          >
+            <div class="play-icon"></div>
+            <div class="pause-icon">
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+
+          <div
+            className="reset-button"
+            onClick={() => {
+              setSeconds(() => 0), setMinutes(() => 0);
+            }}
+          >
+            <img src="restart.svg" alt="reset icon" />
+          </div>
+        </div>
 
         <div class="clock">
-          <div class="hand minute" id="minute"></div>
-          <div class="hand second" id="second"></div>
+          <div class="hand minute"></div>
+          <div class="hand second"></div>
           <div class="center"></div>
 
           <div
@@ -82,6 +100,80 @@ export const UseEffectDemo = () => {
                     justify-content: center;
                 }
 
+
+                .clock-container{
+                  display: flex;
+                  flex-direction: column;
+                  gap: 15px;
+                  align-items: center;
+                
+                }
+
+                .buttons-container{
+                  width: 100%;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                }
+
+                .reset-button{
+                  position: relative;
+                  cursor: pointer;
+                  transition: transform 0.3s ease;
+
+                  &:hover{
+                    transform: rotate(-360deg);
+                  }
+                }  
+
+                .playPauseButton {
+                  width: 40px;
+                  height: 40px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  cursor: pointer;
+                  position: relative;
+
+                  transition: transform 0.2s ease-in;
+
+                  &:hover{
+                    transform: scale(1.2)
+                  }
+
+                  & .play-icon,
+                  & .pause-icon {
+                    width: 30px;
+                    height: 30px;
+                    position: absolute;
+                  }
+
+                  & .play-icon {
+                    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+                    background: var(--black);
+                  }
+
+                  & .pause-icon {
+                    visibility: hidden;
+                    display: flex;
+                    justify-content: space-between;
+
+                    & div {
+                      width: 20px;
+                      height: 100%;
+                      background: var(--black);
+                      margin: 0 2px;
+                    }
+                  }
+
+                  &.pause .play-icon {
+                    visibility: hidden;
+                  }
+                  &.pause .pause-icon {
+                    visibility: visible;
+                  }
+                }
+
                 .clock {
                   position: relative;
                   overflow: hidden;
@@ -125,6 +217,8 @@ export const UseEffectDemo = () => {
                     left: 50%;
                     transform-origin: 50% 100%;
                     border-radius: 4px;
+
+                    transition: transform 0.1s linear;
 
                     &.minute {
                       width: 5px;
