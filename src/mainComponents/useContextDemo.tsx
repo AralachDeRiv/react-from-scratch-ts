@@ -189,11 +189,8 @@ export const UseContextDemo = () => {
                       font-family: var(--hand-write-font-family);
                       font-size: 1.4rem;
                       font-weight: 200;
-                    
-                    }
-                  
+                    }    
                   }
-
 
                   .toggle {
                     position: relative;
