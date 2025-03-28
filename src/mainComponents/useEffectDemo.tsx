@@ -4,32 +4,22 @@ import { DemoTitle } from "../components/demoTitle";
 
 export const UseEffectDemo = () => {
   let [seconds, setSeconds] = Didact.useState(0);
+  let [minutes, setMinutes] = Didact.useState(0);
   let [start, setStart] = Didact.useState(false);
-  let secondsRef = Didact.useRef(seconds);
-  let intervalRef = Didact.useRef(null);
 
   Didact.useEffect(() => {
-    secondsRef.current = seconds;
-  }, [seconds]);
-
-  Didact.useEffect(() => {
-    // let interval: NodeJS.Timeout;
-
-    // console.log(start);
-
-    console.log(seconds);
+    let interval: NodeJS.Timeout;
 
     if (start) {
-      intervalRef.current = setInterval(() => {
-        setSeconds(() => secondsRef.current + 1); // Utilise la fonction de mise à jour
-      }, 1000);
-    } else {
-      console.log("ici");
-
-      clearInterval(intervalRef.current); // Nettoie l’intervalle quand `start` devient `false`
+      interval = setInterval(() => {
+        setSeconds(() => {
+          if (seconds % 60 == 59) setMinutes(() => minutes + 1);
+          return seconds + 1;
+        });
+      }, 150);
     }
 
-    return () => clearInterval(intervalRef.current);
+    return () => clearInterval(interval);
   }, [start]);
 
   return (
@@ -141,7 +131,8 @@ export const UseEffectDemo = () => {
                       height: 70px;
                       background-image: linear-gradient(to top, #ffd166, #ef476f);
 
-                      transform: translateX(-50%);
+                      transform: translateX(-50%) rotate(${minutes * 6}deg);
+
                     }
 
                     &.second {
