@@ -1,15 +1,3 @@
-// function Header() {
-//   const theme = Didact.useContext(ThemeContext); // Consommer le contexte du thème
-
-//   return (
-//     <header style={{ backgroundColor: theme === "light" ? "white" : "black" }}>
-//       <h1 style={{ color: theme === "light" ? "black" : "white" }}>
-//         Current theme: {theme}
-//       </h1>
-//     </header>
-//   );
-// }
-
 import * as Didact from "Didact";
 import { DemoTitle } from "../components/demoTitle";
 import { ContainerStyle } from "../types/types";
@@ -21,16 +9,18 @@ const Lights = () => {
 
   return (
     <div class="room">
-      <div class={`light light-one   ${light}`}></div>
-      <div class={`light light-two   ${light}`}></div>
-      <div class={`light light-three ${light}`}></div>
-      <div class={`light light-four  ${light}`}></div>
-      <div class={`light light-five  ${light}`}></div>
-
-      <h2>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus,
-        delectus!
-      </h2>
+      <div class={`light light-one ${light}`}>
+        <div class="shape triangle"></div>
+      </div>
+      <div class={`light light-two ${light}`}>
+        <div class="shape circle"></div>
+      </div>
+      <div class={`light light-three ${light}`}>
+        <div class="shape star"></div>
+      </div>
+      <div class={`light light-four ${light}`}>
+        <div class="shape diamond"></div>
+      </div>
 
       <style>
         {`
@@ -44,56 +34,104 @@ const Lights = () => {
                       color: var(--black);
                       position :absolute;
                       top: 50%;
-                      z-index: 10;
-                  
-                    
+                      z-index: 10;  
                     }
 
                     .light{
                         position: absolute;
-                        top: -5%;
-                        z-index: 3;
+                        top: -9%;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        z-index: 1;
 
-                        width: 800px; /* Largeur du faisceau lumineux */
-                        height: 700px; /* Hauteur du faisceau lumineux */
-                        clip-path: polygon(50% 0%, 25% 100%, 75% 100%);
+                        width: 750px; 
+                        height: 800px; 
+                        clip-path: polygon(50% 0%, 10% 100%, 90% 100%);
 
-                        &.ON{
-                            background: linear-gradient(
+                        opacity: 0; 
+                        transition: opacity 0.3s ease-in-out;
+
+                        --light-color : ;
+                        background: linear-gradient(
                               180deg,
-                              rgb(142, 154, 160) 0%,
+                              var(--light-color) 0%,
                               rgba(255, 255, 255, 0) 50%,
                               rgba(255, 255, 255, 0) 100%
                             );
+
+                        &.ON{
+                          opacity: 1; 
+                        }
+
+                        &.OFF{
+                          opacity: 0;
                         }
 
                         &.light-one{
-                            transform: rotate(-45deg);
+                            --light-color: #ef476f;
+                            left: 25%;
+                            transition-delay: 0.5s;
                         }
 
                         &.light-two{
-                            left: 0;
+                            --light-color: #ffd166;
+                            left: 45%; 
+                            transition-delay: 0.75s;                       
                         }
 
                         &.light-three{
-                            left: 5%;
-                            transform: rotate(20deg);
+                            --light-color: #06d6a0;
+                            left: 65%; 
+                            transition-delay: 1s;                        
                         }
 
                         &.light-four{
-                            left: 8%;
-                            transform: rotate(30deg);
+                            --light-color: #118ab2;
+                            left: 85%;
+                            transition-delay: 1.25s; 
                         }
 
-                        &.light-five{
-                            left: 10%;
-                            transform: rotate(35deg);
-                        
-                        
-                        }
+                        & .shape{
+                          position : absolute;
+                          top: 220px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          z-index: 10;
+                          width: 100px;
+                          height: 100px;
+                          background-color: var(--black);
 
+                          --shape: ;
+                          clip-path: var(--shape);
+
+                          &.triangle{
+                            --shape : polygon(50% 0%, 0% 100%, 100% 100%);
+                          }
+
+                          &.circle{
+                            --shape: circle(50% at 50% 50%);
+                          }
+
+                          &.star{
+                            --shape: polygon(
+                                      50% 0%,
+                                      61% 35%,
+                                      98% 35%,
+                                      68% 57%,
+                                      79% 91%,
+                                      50% 70%,
+                                      21% 91%,
+                                      32% 57%,
+                                      2% 35%,
+                                      39% 35%
+                                    );  
+                          }
+
+                          &.diamond{
+                            --shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)
+                          }       
+                        }
                     }
-
                 }
             }  
         `}
@@ -178,14 +216,9 @@ export const UseContextDemo = () => {
                       background: #fff;
                       transition: 0.2s ease-in;
                     }
-                    
-                    & input[type="checkbox"]:checked + label:before {
-                      background-image: linear-gradient(#77c2bb, #77c2bb);
-                    }
-                    
+                  
                     & input[type="checkbox"]:checked + label:after {
                       top: 32px;
-                      border-color: #009688;
                     }
                   }
    
@@ -196,84 +229,3 @@ export const UseContextDemo = () => {
     </div>
   );
 };
-
-// <!DOCTYPE html>
-// <html lang="en">
-//   <head>
-//     <meta charset="UTF-8" />
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//     <title>Faisceau Lumineux</title>
-//     <style>
-//       /* Style pour le faisceau lumineux */
-//       .light-holder {
-//         position: relative;
-//         height: 300px; /* Hauteur du faisceau lumineux */
-//         width: 300px; /* Largeur du faisceau lumineux */
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//         justify-content: center;
-//         background-color: #121212;
-//       }
-
-//       .light {
-//         position: absolute;
-//         z-index: 3;
-//         top: 0;
-//         width: 500px; /* Largeur du faisceau lumineux */
-//         height: 600px; /* Hauteur du faisceau lumineux */
-
-//         clip-path: polygon(50% 0%, 25% 100%, 75% 100%);
-//         background: linear-gradient(
-//           180deg,
-//           rgb(142, 154, 160) 0%,
-//           rgba(255, 255, 255, 0) 50%,
-//           rgba(255, 255, 255, 0) 100%
-//         );
-//       }
-
-//       .light-two {
-//         position: absolute;
-//         z-index: 2;
-//         top: -50%;
-//         right: 20%;
-
-//         width: 500px; /* Largeur du faisceau lumineux */
-//         height: 600px; /* Hauteur du faisceau lumineux */
-
-//         transform: rotate(90deg);
-
-//         clip-path: polygon(50% 0%, 25% 100%, 75% 100%);
-//         background: linear-gradient(
-//           180deg,
-//           rgb(142, 154, 160) 0%,
-//           rgba(255, 255, 255, 0) 50%,
-//           rgba(255, 255, 255, 0) 100%
-//         );
-//       }
-
-//       /* Style pour le mot à illuminer */
-//       .text {
-//         font-size: 30px;
-//         font-weight: bold;
-//         color: transparent;
-//         background-clip: text;
-
-//         text-align: center;
-//         z-index: 0;
-//         position: absolute;
-//         bottom: 10px;
-
-//         color: rgba(255, 255, 255, 0.546);
-//         text-shadow: rgba(172, 164, 164, 0.297) 0 5px;
-//       }
-//     </style>
-//   </head>
-//   <body>
-//     <div class="light-holder">
-//       <div class="light"></div>
-//       <div class="light-two"></div>
-//       <span class="text">Illuminé</span>
-//     </div>
-//   </body>
-// </html>

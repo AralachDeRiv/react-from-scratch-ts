@@ -171,14 +171,12 @@ export const UseRefDemo = () => {
                   display: flex;
                   justify-content: space-evenly;
 
-
                 & .box {
                       width: clamp(11rem, 15vw, 15rem); 
                       height: clamp(11rem, 15vw, 15rem);
                       border-radius: 30px;
                       cursor: pointer;
                       background-color: #ff5733;
-                      
 
                       &.box-1{
                         transition:transform 0.5s ease-in-out, background-color 1s ease-in;
