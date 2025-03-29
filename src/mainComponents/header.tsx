@@ -73,7 +73,10 @@ export const Header = () => {
 
       <div className="link-container">
         <img src="/github-icon.svg" alt="github icon" />
-        <a href="https://github.com/" target="_blanc">
+        <a
+          href="https://github.com/AralachDeRiv/react-from-scratch-ts"
+          target="_blanc"
+        >
           See the code
         </a>
       </div>
