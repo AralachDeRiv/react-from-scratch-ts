@@ -5,10 +5,12 @@ export const ContainerWrapper = ({
   style,
   children,
   isFirst,
+  isLast,
 }: {
   style: ContainerStyle;
   children: DidactElementFiber;
   isFirst?: boolean;
+  isLast?: boolean;
 }) => {
   const backgroundColor =
     style == ContainerStyle.LIGHT ? "var(--white)" : "var(--black)";
@@ -34,6 +36,7 @@ export const ContainerWrapper = ({
                     padding: 20px 30px;
                     margin-inline: 2px;
                     border-radius: 20px;
+                    ${isLast ? "border-radius: 20px 20px 0 0;" : ""}
                     background-color: ${backgroundColor};
 
                     display: flex;

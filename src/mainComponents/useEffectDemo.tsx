@@ -122,7 +122,7 @@ export const UseEffectDemo = () => {
                   transition: transform 0.3s ease;
 
                   &:hover{
-                    transform: rotate(-360deg);
+                    transform: scale(1.1);
                   }
                 }  
 
