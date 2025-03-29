@@ -20,7 +20,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    // TODO : Commenter ici
     /* JSX support */
     "jsx": "react-jsx",
     "jsxImportSource": "Didact",

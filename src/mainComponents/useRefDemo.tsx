@@ -2,7 +2,6 @@ import * as Didact from "Didact";
 import { ContainerStyle } from "../types/types";
 import { DemoTitle } from "../components/demoTitle";
 
-// TODO: modifier l'animation de message
 export const UseRefDemo = () => {
   let box1Ref = Didact.useRef(null);
   let box2Ref = Didact.useRef(null);

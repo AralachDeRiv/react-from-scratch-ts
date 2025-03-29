@@ -1,5 +1,4 @@
 import { DidactElement } from "./types";
-// TODO : Commenter ici
 
 declare global {
   namespace JSX {

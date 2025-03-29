@@ -2,7 +2,6 @@ import * as Didact from "Didact";
 import { ContainerStyle } from "../types/types";
 import { DemoTitle } from "../components/demoTitle";
 
-// TODO: maybe change grandient/animation
 export const UseStateDemo = () => {
   const [text, setText] = Didact.useState("");
 

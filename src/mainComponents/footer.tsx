@@ -19,7 +19,6 @@ export const Footer = () => {
             }
 
 
-
             @scope{
                 :scope{
                     width: 100%;
@@ -28,19 +27,15 @@ export const Footer = () => {
                     align-items: center;
                 }
                 
-
                 p{
                     text-align: center;
                     font-weight: 500; 
                     font-size: clamp(0.6rem, 5vw + 0.3rem, 1.2rem);
-
-
                     color: transparent;
+                    
                     background-clip: text;
                     background-size: 200% auto;
-
                     background-image: linear-gradient(to right, 
-                            
                             var(--text-dark-secondary) 40%,
                             #ef476f 45%, 
                             #ffd166 50%, 

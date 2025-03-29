@@ -157,22 +157,11 @@ export function useEffect(effect: () => void | (() => void), deps: any[]) {
     );
   }
 
-  // TODO: see if the debug here doesn't affect other part
-
-  // const hasChanged =
-  //   !oldHook || !deps || deps.some((dep, i) => dep !== oldHook.deps![i]);
-
   let cleanup: (() => void) | null | undefined;
 
   if (oldHook && oldHook.cleanup) {
     oldHook.cleanup();
   }
-
-  // if (hasChanged && oldHook && oldHook.cleanup) {
-  //   cleanup = oldHook.cleanup;
-  // } else {
-  //   cleanup = null;
-  // }
 
   const hook: EffectHook = {
     type: HookType.EFFECT,
@@ -365,12 +354,7 @@ function commitEffects() {
     if (isDidactElementFiber(fiber) && fiber.hooks) {
       fiber.hooks.forEach((hook) => {
         if (hook.type === HookType.EFFECT) {
-          // if (hook.cleanup) {
-          //   hook.cleanup();
-          // }
           effectQueue.push(hook);
-          // const cleanupFn = hook.effect();
-          // hook.cleanup = typeof cleanupFn === "function" ? cleanupFn : null;
         }
       });
     }
