@@ -21,3 +21,21 @@ body {
   font-family: var(--main-font-family);
   font-size: var(--font-size-base);
 }
+
+#incompatible-notice {
+  width: 100vw;
+  height: 100vh;
+  padding: max(20%, 20px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & p {
+    text-align: center;
+    font-size: clamp(0.8rem, 1vw + 0.8rem, 1.8rem);
+    font-weight: 600;
+
+    color: var(--text-light-secondary);
+  }
+}

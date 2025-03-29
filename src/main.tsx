@@ -8,34 +8,43 @@ import { UseStateDemo } from "./mainComponents/useStateDemo";
 import { UseContextDemo } from "./mainComponents/useContextDemo";
 import { UseEffectDemo } from "./mainComponents/useEffectDemo";
 import { Footer } from "./mainComponents/footer";
-
-const App = () => {
-  return (
-    <div>
-      <Header />
-      <ContainerWrapper style={ContainerStyle.LIGHT} isFirst={true}>
-        <Introduction />
-      </ContainerWrapper>
-      <ContainerWrapper style={ContainerStyle.DARK}>
-        <UseStateDemo />
-      </ContainerWrapper>
-      <ContainerWrapper style={ContainerStyle.LIGHT}>
-        <UseRefDemo />
-      </ContainerWrapper>
-      <ContainerWrapper style={ContainerStyle.DARK}>
-        <UseContextDemo />
-      </ContainerWrapper>
-      <ContainerWrapper style={ContainerStyle.LIGHT}>
-        <UseEffectDemo />
-      </ContainerWrapper>
-      <ContainerWrapper style={ContainerStyle.DARK} isLast={true}>
-        <Footer />
-      </ContainerWrapper>
-    </div>
-  );
-};
-
-const app = <App />;
+import { IncompatibleNotice } from "./mainComponents/incompatibleNotice";
 
 const container = document.getElementById("root")!;
-Didact.render(app, container);
+const userAgent = navigator.userAgent.toLowerCase();
+const isChrome = userAgent.includes("chrome") && !userAgent.includes("edg");
+const isDesktop = window.innerWidth > 768;
+
+if (isChrome && isDesktop) {
+  const App = () => {
+    return (
+      <div>
+        <Header />
+        <ContainerWrapper style={ContainerStyle.LIGHT} isFirst={true}>
+          <Introduction />
+        </ContainerWrapper>
+        <ContainerWrapper style={ContainerStyle.DARK}>
+          <UseStateDemo />
+        </ContainerWrapper>
+        <ContainerWrapper style={ContainerStyle.LIGHT}>
+          <UseRefDemo />
+        </ContainerWrapper>
+        <ContainerWrapper style={ContainerStyle.DARK}>
+          <UseContextDemo />
+        </ContainerWrapper>
+        <ContainerWrapper style={ContainerStyle.LIGHT}>
+          <UseEffectDemo />
+        </ContainerWrapper>
+        <ContainerWrapper style={ContainerStyle.DARK} isLast={true}>
+          <Footer />
+        </ContainerWrapper>
+      </div>
+    );
+  };
+
+  const app = <App />;
+  Didact.render(app, container);
+} else {
+  const notice = <IncompatibleNotice />;
+  Didact.render(notice, container);
+}
