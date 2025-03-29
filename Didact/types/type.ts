@@ -94,7 +94,7 @@ export type EffectHook = {
 };
 
 export type ContextType<T> = {
-  Provider: ({ value, children }: { value: T; children: any }) => any;
+  Provider: ({ value, children }: { value: T; children?: any }) => any;
   _currentValue: T;
 };
 

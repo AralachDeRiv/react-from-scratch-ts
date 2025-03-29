@@ -79,9 +79,7 @@ const isProperty = (key: string) => key !== "children" && !isEvent(key);
 const isNew =
   (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
     prev[key] !== next[key];
-const isGone =
-  (prev: Record<string, any>, next: Record<string, any>) => (key: string) =>
-    !(key in next);
+const isGone = (next: Record<string, any>) => (key: string) => !(key in next);
 
 export function removeOldProperties(
   dom: HTMLElement | Text,
@@ -90,7 +88,7 @@ export function removeOldProperties(
 ) {
   Object.keys(prevProps)
     .filter(isProperty)
-    .filter(isGone(prevProps, nextProps))
+    .filter(isGone(nextProps))
     .forEach((name) => {
       if (name === "style" && dom instanceof HTMLElement) {
         dom.style.cssText = "";

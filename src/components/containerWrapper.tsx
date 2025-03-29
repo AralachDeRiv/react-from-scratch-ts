@@ -8,7 +8,7 @@ export const ContainerWrapper = ({
   isLast,
 }: {
   style: ContainerStyle;
-  children: DidactElementFiber;
+  children?: DidactElementFiber;
   isFirst?: boolean;
   isLast?: boolean;
 }) => {
